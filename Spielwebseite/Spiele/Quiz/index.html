@@ -1,0 +1,121 @@
+<!-- spiele/quiz/index.html -->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef;
+      text-align: center;
+      padding: 20px;
+    }
+    .question-box {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      display: inline-block;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    .question {
+      font-size: 1.2em;
+      margin: 20px 0;
+    }
+    .options button {
+      display: block;
+      margin: 10px auto;
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    a {
+      display: block;
+      margin-top: 20px;
+      color: #4CAF50;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>Quiz</h1>
+  <div class="question-box" id="quiz-container">
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div id="result"></div>
+    <button onclick="nextQuestion()">Nächste Frage</button>
+  </div>
+  <a href="../../index.html">← Zurück zur Startseite</a>
+
+  <script>
+    const questions = [
+      {
+        text: "Was ist die Hauptstadt von Deutschland?",
+        answers: ["Berlin", "München", "Hamburg", "Köln"],
+        correct: 0
+      },
+      {
+        text: "Wie viele Farben hat der Regenbogen?",
+        answers: ["5", "6", "7", "8"],
+        correct: 2
+      },
+      {
+        text: "Welcher Planet ist der Sonne am nächsten?",
+        answers: ["Mars", "Venus", "Merkur", "Erde"],
+        correct: 2
+      }
+    ];
+
+    let current = 0;
+
+    function showQuestion() {
+      const q = questions[current];
+      document.getElementById("question").textContent = q.text;
+      const optionsDiv = document.getElementById("options");
+      const result = document.getElementById("result");
+      result.textContent = "";
+      optionsDiv.innerHTML = "";
+      q.answers.forEach((answer, i) => {
+        const btn = document.createElement("button");
+        btn.textContent = answer;
+        btn.onclick = () => checkAnswer(i);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(i) {
+      const correct = questions[current].correct;
+      const result = document.getElementById("result");
+      if (i === correct) {
+        result.textContent = "Richtig!";
+        result.style.color = "green";
+      } else {
+        result.textContent = "Falsch!";
+        result.style.color = "red";
+      }
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current < questions.length) {
+        showQuestion();
+      } else {
+        document.getElementById("quiz-container").innerHTML = "<h2>Quiz beendet!</h2>";
+      }
+    }
+
+    // Erste Frage anzeigen
+    showQuestion();
+  </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!-- spiele/tic-tac-toe/index.html -->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Tic Tac Toe</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f0f0;
+    }
+    h1 {
+      margin-top: 30px;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 5px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .cell {
+      background-color: white;
+      border: 2px solid #444;
+      font-size: 2.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .cell:hover { background-color: #ddd; }
+    #message {
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    a { display: block; margin-top: 30px; color: #4CAF50; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>Tic Tac Toe</h1>
+  <div class="board" id="board"></div>
+  <div id="message"></div>
+  <button onclick="startGame()">Neustart</button>
+  <a href="../../index.html">← Zurück zur Startseite</a>
+
+  <script>
+    const board = document.getElementById("board");
+    const message = document.getElementById("message");
+    let currentPlayer = "X";
+    let cells = [];
+
+    function startGame() {
+      board.innerHTML = "";
+      message.textContent = "Spieler X beginnt";
+      currentPlayer = "X";
+      cells = Array(9).fill(null);
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.addEventListener("click", () => makeMove(i));
+        board.appendChild(cell);
+      }
+    }
+
+    function makeMove(index) {
+      if (cells[index] !== null) return;
+      const cellEl = board.children[index];
+      cells[index] = currentPlayer;
+      cellEl.textContent = currentPlayer;
+
+      if (checkWinner()) {
+        message.textContent = `Spieler ${currentPlayer} gewinnt!`;
+        disableBoard();
+        return;
+      }
+      if (cells.every(c => c !== null)) {
+        message.textContent = "Unentschieden!";
+        return;
+      }
+      currentPlayer = currentPlayer === "X" ? "O" : "X";
+      message.textContent = `Spieler ${currentPlayer} ist dran`;
+    }
+
+    function checkWinner() {
+      const wins = [
+        [0,1,2], [3,4,5], [6,7,8],
+        [0,3,6], [1,4,7], [2,5,8],
+        [0,4,8], [2,4,6]
+      ];
+      return wins.some(([a,b,c]) => cells[a] && cells[a] === cells[b] && cells[a] === cells[c]);
+    }
+
+    function disableBoard() {
+      for (let i = 0; i < 9; i++) {
+        board.children[i].style.pointerEvents = "none";
+      }
+    }
+
+    // Spiel bei Laden starten
+    startGame();
+  </script>
+</body>
+</html>
