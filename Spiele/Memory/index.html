@@ -1,119 +1,70 @@
-<!-- spiele/memory/index.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Memory</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Memory – MaxLabz Games</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-      text-align: center;
-    }
-    h1 {
-      margin: 20px;
-    }
-    .game-board {
-      display: grid;
-      grid-template-columns: repeat(4, 100px);
-      gap: 10px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-    .card {
-      width: 100px;
-      height: 100px;
-      background-color: #444;
-      color: white;
-      font-size: 2em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      user-select: none;
-    }
-    .card.revealed {
-      background-color: #4CAF50;
-    }
-    #message {
-      margin-top: 20px;
-      font-size: 1.2em;
-    }
-    a {
-      display: block;
-      margin-top: 30px;
-      color: #4CAF50;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:Arial,sans-serif; background:#222; color:#f1f1f1; text-align:center; }
+    a { color:#4CAF50; text-decoration:none; } a:hover { text-decoration:underline; }
+    header { background:#111; padding:20px; }
+    header h1 { color:#4CAF50; }
+    nav { background:#1a1a1a; padding:10px; display:flex; justify-content:center; gap:15px; }
+    nav a { font-weight:bold; }
+    main { max-width:800px; margin:30px auto; padding:0 20px; }
+    .game-board { display:grid; grid-template-columns:repeat(4,100px); gap:10px; justify-content:center; }
+    .card { width:100px;height:100px; background:#444; color:#fff; font-size:2em;
+           display:flex; align-items:center; justify-content:center; cursor:pointer; user-select:none; }
+    .card.revealed { background:#4CAF50; }
+    footer { background:#111; padding:20px; margin-top:40px; }
+    footer p { color:#777; }
   </style>
 </head>
 <body>
-  <h1>Memory</h1>
-  <div class="game-board" id="board"></div>
-  <div id="message"></div>
-  <a href="../../index.html">← Zurück zur Startseite</a>
+  <header><h1>Memory</h1></header>
+  <nav>
+    <a href="../../index.html">Startseite</a>
+    <a href="../Quiz/index.html">Quiz</a>
+    <a href="../Snake/index.html">Snake</a>
+    <a href="../Tic-tac-Toe/index.html">Tic-Tac-Toe</a>
+    <a href="../fruit-ninja/index.html">Fruit Ninja</a>
+  </nav>
+  <main>
+    <div id="board" class="game-board"></div>
+    <div id="message" style="margin-top:20px;"></div>
+    <button onclick="createBoard()" style="margin-top:20px;">Neustart</button>
+  </main>
+  <footer><p>© 2025 MaxLabz Games</p></footer>
 
   <script>
-    const symbols = ["🧸","⚽️","🍟","☀️","🐉","🍄","🦋","💍"];
-    let cards = [...symbols, ...symbols];
-    let board = document.getElementById("board");
-    let firstCard = null;
-    let lock = false;
-    let matches = 0;
-
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-    }
-
-    function createBoard() {
-      shuffle(cards);
-      board.innerHTML = "";
-      matches = 0;
-      document.getElementById("message").textContent = "";
-      cards.forEach((symbol, index) => {
-        const card = document.createElement("div");
-        card.classList.add("card");
-        card.dataset.symbol = symbol;
-        card.dataset.index = index;
-        card.addEventListener("click", () => revealCard(card));
-        board.appendChild(card);
+    const symbols = ["🍎","🍌","🍇","🍓","🍍","🥝","🍒","🍑"];
+    let cards = [...symbols, ...symbols], firstCard=null, lock=false, matches=0;
+    const board = document.getElementById("board"), message = document.getElementById("message");
+    function shuffle(a){ for(let i=a.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } }
+    function createBoard(){
+      shuffle(cards); board.innerHTML=""; message.textContent=""; firstCard=null; lock=false; matches=0;
+      cards.forEach(sym=>{ 
+        const c=document.createElement("div"); c.className="card"; c.dataset.symbol=sym;
+        c.onclick=()=>reveal(c); board.appendChild(c);
       });
     }
-
-    function revealCard(card) {
-      if (lock || card.classList.contains("revealed")) return;
-      card.classList.add("revealed");
-      card.textContent = card.dataset.symbol;
-
-      if (!firstCard) {
-        firstCard = card;
-      } else {
-        lock = true;
-        setTimeout(() => {
-          if (card.dataset.symbol === firstCard.dataset.symbol) {
-            matches++;
-            if (matches === symbols.length) {
-              document.getElementById("message").textContent = "Gewonnen!";
-            }
+    function reveal(c){
+      if(lock||c.classList.contains("revealed")) return;
+      c.classList.add("revealed"); c.textContent=c.dataset.symbol;
+      if(!firstCard) firstCard=c;
+      else { lock=true;
+        setTimeout(()=>{
+          if(c.dataset.symbol===firstCard.dataset.symbol){
+            matches++; if(matches===symbols.length) message.textContent="Gewonnen!";
           } else {
-            card.classList.remove("revealed");
-            card.textContent = "";
-            firstCard.classList.remove("revealed");
-            firstCard.textContent = "";
+            c.classList.remove("revealed"); c.textContent="";
+            firstCard.classList.remove("revealed"); firstCard.textContent="";
           }
-          firstCard = null;
-          lock = false;
-        }, 800);
+          firstCard=null; lock=false;
+        },800);
       }
     }
-
-    // Board initial erstellen
     createBoard();
   </script>
 </body>
