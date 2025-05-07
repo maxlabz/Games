@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Nachrichten</title>
+</head>
+<body>
+  <h1>Nachricht senden</h1>
+
+  <form id="messageForm">
+    <input type="email" id="recipient" placeholder="Empfänger E-Mail" required><br>
+    <textarea id="message" placeholder="Deine Nachricht" required></textarea><br>
+    <button type="submit">Senden</button>
+  </form>
+
+  <h2>Nachrichten an dich:</h2>
+  <ul id="inbox"></ul>
+
+  <!-- Firebase -->
+  <script type="module" src="firebase-init.js"></script>
+  <!-- Nachrichten-Logik -->
+  <script type="module" src="nachrichten.js"></script>
+</body>
+</html>
