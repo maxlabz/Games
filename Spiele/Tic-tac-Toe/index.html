@@ -1,27 +1,24 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Tic-Tac-Toe – MaxLabz Games</title>
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:Arial,sans-serif; background:#222; color:#f1f1f1; text-align:center; }
-    a { color:#4CAF50; text-decoration:none; } a:hover { text-decoration:underline; }
-    header { background:#111; padding:20px; }
-    header h1 { color:#4CAF50; }
-    nav { background:#1a1a1a; padding:10px; display:flex; justify-content:center; gap:15px; }
-    nav a { font-weight:bold; }
-    main { margin:30px auto; max-width:320px; }
-    .board { display:grid; grid-template:repeat(3,100px)/repeat(3,100px); gap:5px; }
-    .cell { background:#444; display:flex; align-items:center; justify-content:center;
-            font-size:2em; cursor:pointer; }
-    .cell:hover { background:#555; }
-    footer { background:#111; padding:20px; margin-top:40px; }
-    footer p { color:#777; }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:Arial,sans-serif;background:#222;color:#f1f1f1;text-align:center;}
+    header{background:#111;padding:20px;} header h1{color:#4CAF50;}
+    nav{background:#1a1a1a;padding:10px;display:flex;justify-content:center;gap:15px;}
+    nav a{color:#f1f1f1;font-weight:bold;text-decoration:none;} nav a:hover{color:#4CAF50;}
+    .board{display:grid;grid-template:repeat(3,100px)/repeat(3,100px);gap:5px;margin:30px auto;}
+    .cell{background:#444;display:flex;align-items:center;justify-content:center;font-size:2em;cursor:pointer;}
+    .cell:hover{background:#555;}
+    #message{margin:20px;font-size:1.2em;}
+    button{padding:10px 20px;background:#4CAF50;border:none;border-radius:5px;color:#121212;cursor:pointer;}
+    footer{background:#111;padding:20px;margin-top:40px;color:#777;}
   </style>
 </head>
 <body>
+
   <header><h1>Tic-Tac-Toe</h1></header>
   <nav>
     <a href="../../index.html">Startseite</a>
@@ -30,34 +27,44 @@
     <a href="../Snake/index.html">Snake</a>
     <a href="../fruit-ninja/index.html">Fruit Ninja</a>
   </nav>
-  <main>
-    <div id="board" class="board"></div>
-    <div id="message" style="margin:20px 0;"></div>
-    <button onclick="startGame()">Neustart</button>
-  </main>
-  <footer><p>© 2025 MaxLabz Games</p></footer>
 
+  <div class="board" id="board"></div>
+  <div id="message"></div>
+  <button onclick="startGame()">Neustart</button>
+  <footer>&copy; 2025 MaxLabz Games</footer>
+
+  <!-- Highscore-Integration -->
+  <script type="module" src="../../highscores.js"></script>
   <script>
+    import { submitHighScore } from '../../highscores.js';
+
     const boardEl=document.getElementById("board"), msg=document.getElementById("message");
     let cells, current;
+
     function startGame(){
       boardEl.innerHTML=""; current="X"; msg.textContent="Spieler X ist dran";
       cells=Array(9).fill(null);
       for(let i=0;i<9;i++){
-        const c=document.createElement("div"); c.className="cell";
-        c.onclick=()=>move(i,c); boardEl.appendChild(c);
+        const c=document.createElement("div");
+        c.className="cell"; c.onclick=()=>move(i,c);
+        boardEl.appendChild(c);
       }
     }
     function move(i,cEl){
-      if(cells[i]) return;
+      if(cells[i])return;
       cells[i]=current; cEl.textContent=current;
-      if(check()) { msg.textContent=`${current} gewinnt!`; return; }
-      if(cells.every(x=>x)) { msg.textContent="Unentschieden!"; return; }
+      if(check()){
+        msg.textContent=`Spieler ${current} gewinnt!`;
+        // Highscore absenden: 1 Punkt für Sieg
+        submitHighScore('TicTacToe', 1);
+        return;
+      }
+      if(cells.every(x=>x)){ msg.textContent="Unentschieden!"; return; }
       current=current==="X"?"O":"X"; msg.textContent=`Spieler ${current} ist dran`;
     }
     function check(){
       const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-      return wins.some(([a,b,c])=>cells[a] && cells[a]===cells[b]&&cells[a]===cells[c]);
+      return wins.some(([a,b,c])=>cells[a]&&cells[a]===cells[b]&&cells[a]===cells[c]);
     }
     startGame();
   </script>
