@@ -1,77 +1,62 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Snake – MaxLabz Games</title>
   <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{font-family:Arial,sans-serif;background:#222;color:#f1f1f1;text-align:center;}
-    header{background:#111;padding:20px;} header h1{color:#4CAF50;}
-    nav{background:#1a1a1a;padding:10px;display:flex;justify-content:center;gap:15px;}
-    nav a{color:#f1f1f1;font-weight:bold;text-decoration:none;} nav a:hover{color:#4CAF50;}
-    main{margin:30px auto;max-width:420px;position:relative;}
-    canvas{background:#000;display:block;margin:0 auto;border:2px solid #4CAF50;}
-    #scoreDisplay{position:absolute;top:10px;left:50%;transform:translateX(-50%);color:#fff;font-size:1.2em;}
-    footer{background:#111;padding:20px;margin-top:40px;color:#777;}
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:Arial,sans-serif; background:#222; color:#f1f1f1; text-align:center; }
+    a { color:#4CAF50; text-decoration:none; } a:hover { text-decoration:underline; }
+    header { background:#111; padding:20px; }
+    header h1 { color:#4CAF50; }
+    nav { background:#1a1a1a; padding:10px; display:flex; justify-content:center; gap:15px; }
+    nav a { font-weight:bold; }
+    main { margin:30px auto; max-width:420px; }
+    canvas { background:#000; display:block; margin:0 auto; border:2px solid #4CAF50; }
+    footer { background:#111; padding:20px; margin-top:40px; }
+    footer p { color:#777; }
   </style>
 </head>
 <body>
-
   <header><h1>Snake</h1></header>
   <nav>
     <a href="../../index.html">Startseite</a>
     <a href="../Memory/index.html">Memory</a>
     <a href="../Quiz/index.html">Quiz</a>
-    <a href="../Tic-tac-Toe/index.html">Tic Tac Toe</a>
+    <a href="../Tic-tac-Toe/index.html">Tic-Tac-Toe</a>
     <a href="../fruit-ninja/index.html">Fruit Ninja</a>
   </nav>
-
   <main>
-    <div id="scoreDisplay">Score: 0</div>
     <canvas id="game" width="400" height="400"></canvas>
   </main>
+  <footer><p>© 2025 MaxLabz Games</p></footer>
 
-  <footer>&copy; 2025 MaxLabz Games</footer>
-
-  <!-- Highscore-Integration -->
-  <script type="module" src="../../highscores.js"></script>
   <script>
-    import { submitHighScore } from '../../highscores.js';
-
-    const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
+    const canvas=document.getElementById("game"), ctx=canvas.getContext("2d");
     const grid=20, cols=canvas.width/grid, rows=canvas.height/grid;
-    let snake=[{x:9*grid,y:9*grid}],dir={x:1,y:0},food,score=0,gameInterval;
-    const scoreDisplay=document.getElementById("scoreDisplay");
-
-    function spawnFood(){food={x:Math.floor(Math.random()*cols)*grid,y:Math.floor(Math.random()*rows)*grid};}
+    let snake=[{x:9*grid,y:9*grid}], dir={x:1,y:0}, food=spawn();
+    document.addEventListener("keydown",e=>{
+      if(e.key==="ArrowUp"&&dir.y===0) dir={x:0,y:-1};
+      if(e.key==="ArrowDown"&&dir.y===0) dir={x:0,y:1};
+      if(e.key==="ArrowLeft"&&dir.x===0) dir={x:-1,y:0};
+      if(e.key==="ArrowRight"&&dir.x===0) dir={x:1,y:0};
+    });
+    function spawn(){ return {x:Math.floor(Math.random()*cols)*grid, y:Math.floor(Math.random()*rows)*grid}; }
     function draw(){
-      ctx.fillStyle="#000";ctx.fillRect(0,0,400,400);
-      snake.forEach((s,i)=>{ctx.fillStyle=i?"lime":"green";ctx.fillRect(s.x,s.y,grid,grid)});
-      ctx.fillStyle="red";ctx.fillRect(food.x,food.y,grid,grid);
+      ctx.fillStyle="#000"; ctx.fillRect(0,0,400,400);
+      snake.forEach((s,i)=>{ ctx.fillStyle=i? "lime":"green"; ctx.fillRect(s.x,s.y,grid,grid); });
+      ctx.fillStyle="red"; ctx.fillRect(food.x,food.y,grid,grid);
     }
     function update(){
-      const head={x:snake[0].x+dir.x*grid,y:snake[0].y+dir.y*grid};
-      if(head.x<0||head.y<0||head.x>=400||head.y>=400||snake.some(s=>s.x===head.x&&s.y===head.y)){
-        clearInterval(gameInterval);
-        // Highscore absenden
-        submitHighScore('Snake', score);
-        alert("Game Over! Punkte: "+score);
-        return;
+      const head={x:snake[0].x+dir.x*grid, y:snake[0].y+dir.y*grid};
+      if(head.x<0||head.y<0||head.x>=400||head.y>=400|| snake.some(s=>s.x===head.x&&s.y===head.y)){
+        clearInterval(game); alert("Game Over"); return;
       }
       snake.unshift(head);
-      if(head.x===food.x&&head.y===food.y){
-        score++; scoreDisplay.textContent="Score: "+score; spawnFood();
-      } else snake.pop();
+      if(head.x===food.x&&head.y===food.y) food=spawn(); else snake.pop();
     }
-    function changeDir(e){
-      if(e.key==="ArrowUp"&&dir.y===0)dir={x:0,y:-1};
-      if(e.key==="ArrowDown"&&dir.y===0)dir={x:0,y:1};
-      if(e.key==="ArrowLeft"&&dir.x===0)dir={x:-1,y:0};
-      if(e.key==="ArrowRight"&&dir.x===0)dir={x:1,y:0};
-    }
-    document.addEventListener("keydown",changeDir);
-    spawnFood();
-    gameInterval=setInterval(()=>{update();draw();},100);
+    const game=setInterval(()=>{ update(); draw(); },100);
   </script>
 </body>
 </html>
