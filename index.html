@@ -5,88 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MaxLabz Games</title>
   <style>
-    /* Reset */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: Arial, sans-serif;
-      background: #121212;
-      color: #f1f1f1;
-      text-align: center;
-      line-height: 1.5;
-      padding: 20px;
-    }
-    a { color: #4CAF50; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    header {
-      margin-bottom: 30px;
-    }
-    header h1 {
-      font-size: 2.5rem;
-      color: #4CAF50;
-    }
-    nav.main-nav {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 15px;
-      margin-bottom: 40px;
-    }
-    nav.main-nav a {
-      background: #1f1f1f;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-weight: bold;
-      transition: background 0.3s;
-    }
-    nav.main-nav a:hover {
-      background: #4CAF50;
-      color: #121212;
-    }
-
-    section.games {
-      margin-bottom: 40px;
-    }
-    section.games h2 {
-      margin-bottom: 20px;
-      color: #4CAF50;
-    }
-    .game-list {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-    }
-    .game-list a {
-      display: block;
-      background: #1f1f1f;
-      padding: 20px 30px;
-      border-radius: 10px;
-      font-size: 1.1rem;
-      min-width: 140px;
-      transition: background 0.3s;
-    }
-    .game-list a:hover {
-      background: #4CAF50;
-      color: #121212;
-    }
-
-    footer {
-      margin-top: 60px;
-      font-size: 0.9rem;
-      color: #777;
-    }
+    /* Reset & Grunddesign (wie gehabt) */
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:Arial,sans-serif; background:#121212; color:#f1f1f1; text-align:center; padding:20px; }
+    a { color:#4CAF50; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    header h1 { font-size:2.5rem; color:#4CAF50; margin-bottom:30px; }
+    nav.main-nav { display:flex; flex-wrap:wrap; justify-content:center; gap:15px; margin-bottom:40px; }
+    nav.main-nav a { background:#1f1f1f; padding:12px 20px; border-radius:8px; font-weight:bold; transition:background .3s; }
+    nav.main-nav a:hover { background:#4CAF50; color:#121212; }
+    section.games { margin-bottom:40px; }
+    section.games h2 { color:#4CAF50; margin-bottom:20px; }
+    .game-list { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; }
+    .game-list a { background:#1f1f1f; padding:20px 30px; border-radius:10px; min-width:140px; transition:background .3s; }
+    .game-list a:hover { background:#4CAF50; color:#121212; }
+    footer { margin-top:60px; font-size:.9rem; color:#777; }
   </style>
 </head>
 <body>
 
-  <!-- Firebase Initialisierung -->
+  <!-- 1) Firebase init -->
   <script type="module" src="firebase-init.js"></script>
 
   <header>
     <h1>MaxLabz Games</h1>
   </header>
 
+  <!-- 2) Navigation mit Logout -->
   <nav class="main-nav">
     <a href="index.html">Startseite</a>
     <a href="register.html">Registrieren</a>
@@ -95,6 +40,7 @@
     <a href="#" id="logout">Logout</a>
   </nav>
 
+  <!-- 3) Spiele-Einbindung -->
   <section class="games">
     <h2>Unsere Spiele</h2>
     <div class="game-list">
@@ -110,12 +56,12 @@
     &copy; 2025 MaxLabz Games
   </footer>
 
-  <!-- Logout-Skript -->
+  <!-- 4) Logout-Skript -->
   <script type="module">
     import { auth } from './firebase-init.js';
     import { signOut } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
 
-    document.getElementById('logout').addEventListener('click', async (e) => {
+    document.getElementById('logout').addEventListener('click', async e => {
       e.preventDefault();
       try {
         await signOut(auth);
