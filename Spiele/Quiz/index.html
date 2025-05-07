@@ -1,68 +1,83 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Quiz – MaxLabz Games</title>
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:Arial,sans-serif; background:#222; color:#f1f1f1; text-align:center; padding:20px; }
-    a { color:#4CAF50; text-decoration:none; } a:hover { text-decoration:underline; }
-    header { background:#111; padding:20px; }
-    header h1 { color:#4CAF50; }
-    nav { background:#1a1a1a; padding:10px; display:flex; justify-content:center; gap:15px; }
-    nav a { font-weight:bold; }
-    main { max-width:600px; margin:30px auto; background:#1a1a1a; padding:20px; border-radius:10px; }
-    .question { font-size:1.2em; margin-bottom:20px; }
-    .options button { display:block; margin:10px auto; padding:10px 20px; cursor:pointer; }
-    #result { margin-top:20px; font-weight:bold; }
-    footer { background:#111; padding:20px; margin-top:40px; }
-    footer p { color:#777; }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:Arial,sans-serif;background:#222;color:#f1f1f1;text-align:center;padding:20px;}
+    header{background:#111;padding:20px;} header h1{color:#4CAF50;}
+    nav{background:#1a1a1a;padding:10px;display:flex;justify-content:center;gap:15px;}
+    nav a{color:#f1f1f1;font-weight:bold;text-decoration:none;} nav a:hover{color:#4CAF50;}
+    main{max-width:600px;margin:30px auto;background:#1a1a1a;padding:20px;border-radius:10px;}
+    .question{font-size:1.2em;margin-bottom:20px;}
+    .options button{display:block;margin:10px auto;padding:10px 20px;cursor:pointer;}
+    #result{margin-top:20px;font-weight:bold;}
+    button.next{margin-top:20px;padding:10px 20px;background:#4CAF50;border:none;border-radius:5px;color:#121212;cursor:pointer;}
+    footer{background:#111;padding:20px;margin-top:40px;color:#777;}
   </style>
 </head>
 <body>
+
   <header><h1>Quiz</h1></header>
   <nav>
     <a href="../../index.html">Startseite</a>
     <a href="../Memory/index.html">Memory</a>
     <a href="../Snake/index.html">Snake</a>
-    <a href="../Tic-tac-Toe/index.html">Tic-Tac-Toe</a>
+    <a href="../Tic-tac-Toe/index.html">Tic Tac Toe</a>
     <a href="../fruit-ninja/index.html">Fruit Ninja</a>
   </nav>
-  <main>
-    <div id="question" class="question"></div>
-    <div id="options" class="options"></div>
-    <div id="result"></div>
-    <button onclick="nextQuestion()" style="margin-top:20px;">Nächste Frage</button>
-  </main>
-  <footer><p>© 2025 MaxLabz Games</p></footer>
 
+  <main>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div id="result"></div>
+    <button class="next" id="nextBtn" onclick="nextQuestion()">Nächste Frage</button>
+  </main>
+
+  <footer>&copy; 2025 MaxLabz Games</footer>
+
+  <!-- Highscore-Integration -->
+  <script type="module" src="../../highscores.js"></script>
   <script>
+    import { submitHighScore } from '../../highscores.js';
+
     const questions=[
       {text:"Was ist die Hauptstadt von Deutschland?",answers:["Berlin","München","Hamburg","Köln"],correct:0},
       {text:"Wie viele Farben hat der Regenbogen?",answers:["5","6","7","8"],correct:2},
       {text:"Welcher Planet ist der Sonne am nächsten?",answers:["Mars","Venus","Merkur","Erde"],correct:2}
     ];
-    let current=0;
+    let current=0, score=0;
+
     function showQuestion(){
       const q=questions[current];
       document.getElementById("question").textContent=q.text;
-      const opt=document.getElementById("options"); opt.innerHTML=""; document.getElementById("result").textContent="";
+      const opt=document.getElementById("options"), res=document.getElementById("result");
+      opt.innerHTML=""; res.textContent="";
       q.answers.forEach((a,i)=>{
         const btn=document.createElement("button");
-        btn.textContent=a; btn.onclick=()=>checkAnswer(i);
+        btn.textContent=a;
+        btn.onclick=()=>checkAnswer(i);
         opt.appendChild(btn);
       });
     }
     function checkAnswer(i){
       const res=document.getElementById("result");
-      res.textContent=(i===questions[current].correct)?"Richtig!":"Falsch!";
-      res.style.color=(i===questions[current].correct)?"#4CAF50":"#f44336";
+      if(i===questions[current].correct){
+        res.textContent="Richtig!"; res.style.color="#4CAF50"; score++;
+      } else {
+        res.textContent="Falsch!"; res.style.color="#f44336";
+      }
     }
     function nextQuestion(){
       current++;
-      if(current<questions.length) showQuestion();
-      else document.querySelector("main").innerHTML="<h2>Quiz beendet!</h2>";
+      if(current<questions.length){
+        showQuestion();
+      } else {
+        document.querySelector("main").innerHTML=`<h2>Quiz beendet! Dein Score: ${score}</h2>`;
+        // Highscore absenden
+        submitHighScore('Quiz', score);
+      }
     }
     showQuestion();
   </script>
