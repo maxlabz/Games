@@ -1,42 +1,47 @@
-// nachrichten.js
-import { auth, db } from './firebase-init.js';
-import {
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import {
-  collection, addDoc, query, where, getDocs, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { firebaseConfig } from './firebase-init.js';
 
-window.sendeNachricht = async function () {
-  const empfaenger = document.getElementById("empfaenger").value;
-  const inhalt = document.getElementById("nachricht").value;
+// Init Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// Nachricht senden
+const form = document.getElementById("messageForm");
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const recipient = document.getElementById("recipient").value;
+  const message = document.getElementById("message").value;
 
   const user = auth.currentUser;
   if (!user) {
-    alert("Bitte zuerst einloggen.");
+    alert("Du musst eingeloggt sein, um eine Nachricht zu senden.");
     return;
   }
 
-  await addDoc(collection(db, "nachrichten"), {
-    von: user.email,
-    an: empfaenger,
-    inhalt: inhalt,
-    zeit: serverTimestamp()
+  await addDoc(collection(db, "messages"), {
+    from: user.email,
+    to: recipient,
+    message: message,
+    timestamp: new Date()
   });
 
   alert("Nachricht gesendet!");
-};
+  form.reset();
+});
 
+// Nachrichten empfangen
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    const q = query(collection(db, "nachrichten"), where("an", "==", user.email));
+    const inbox = document.getElementById("inbox");
+    const q = query(collection(db, "messages"), where("to", "==", user.email));
     const querySnapshot = await getDocs(q);
-    const liste = document.getElementById("nachrichtenListe");
     querySnapshot.forEach((doc) => {
-      const daten = doc.data();
       const li = document.createElement("li");
-      li.textContent = `[Von: ${daten.von}] ${daten.inhalt}`;
-      liste.appendChild(li);
+      li.textContent = `Von ${doc.data().from}: ${doc.data().message}`;
+      inbox.appendChild(li);
     });
   }
 });
