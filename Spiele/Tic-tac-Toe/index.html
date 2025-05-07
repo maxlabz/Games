@@ -1,111 +1,64 @@
-<!-- spiele/tic-tac-toe/index.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Tic Tac Toe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tic-Tac-Toe – MaxLabz Games</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f0f0f0;
-    }
-    h1 {
-      margin-top: 30px;
-    }
-    .board {
-      display: grid;
-      grid-template-columns: repeat(3, 100px);
-      grid-template-rows: repeat(3, 100px);
-      gap: 5px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-    .cell {
-      background-color: white;
-      border: 2px solid #444;
-      font-size: 2.5em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-    .cell:hover { background-color: #ddd; }
-    #message {
-      margin-top: 20px;
-      font-size: 1.2em;
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 1em;
-      cursor: pointer;
-    }
-    a { display: block; margin-top: 30px; color: #4CAF50; text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:Arial,sans-serif; background:#222; color:#f1f1f1; text-align:center; }
+    a { color:#4CAF50; text-decoration:none; } a:hover { text-decoration:underline; }
+    header { background:#111; padding:20px; }
+    header h1 { color:#4CAF50; }
+    nav { background:#1a1a1a; padding:10px; display:flex; justify-content:center; gap:15px; }
+    nav a { font-weight:bold; }
+    main { margin:30px auto; max-width:320px; }
+    .board { display:grid; grid-template:repeat(3,100px)/repeat(3,100px); gap:5px; }
+    .cell { background:#444; display:flex; align-items:center; justify-content:center;
+            font-size:2em; cursor:pointer; }
+    .cell:hover { background:#555; }
+    footer { background:#111; padding:20px; margin-top:40px; }
+    footer p { color:#777; }
   </style>
 </head>
 <body>
-  <h1>Tic Tac Toe</h1>
-  <div class="board" id="board"></div>
-  <div id="message"></div>
-  <button onclick="startGame()">Neustart</button>
-  <a href="../../index.html">← Zurück zur Startseite</a>
+  <header><h1>Tic-Tac-Toe</h1></header>
+  <nav>
+    <a href="../../index.html">Startseite</a>
+    <a href="../Memory/index.html">Memory</a>
+    <a href="../Quiz/index.html">Quiz</a>
+    <a href="../Snake/index.html">Snake</a>
+    <a href="../fruit-ninja/index.html">Fruit Ninja</a>
+  </nav>
+  <main>
+    <div id="board" class="board"></div>
+    <div id="message" style="margin:20px 0;"></div>
+    <button onclick="startGame()">Neustart</button>
+  </main>
+  <footer><p>© 2025 MaxLabz Games</p></footer>
 
   <script>
-    const board = document.getElementById("board");
-    const message = document.getElementById("message");
-    let currentPlayer = "X";
-    let cells = [];
-
-    function startGame() {
-      board.innerHTML = "";
-      message.textContent = "Spieler X beginnt";
-      currentPlayer = "X";
-      cells = Array(9).fill(null);
-      for (let i = 0; i < 9; i++) {
-        const cell = document.createElement("div");
-        cell.className = "cell";
-        cell.addEventListener("click", () => makeMove(i));
-        board.appendChild(cell);
+    const boardEl=document.getElementById("board"), msg=document.getElementById("message");
+    let cells, current;
+    function startGame(){
+      boardEl.innerHTML=""; current="X"; msg.textContent="Spieler X ist dran";
+      cells=Array(9).fill(null);
+      for(let i=0;i<9;i++){
+        const c=document.createElement("div"); c.className="cell";
+        c.onclick=()=>move(i,c); boardEl.appendChild(c);
       }
     }
-
-    function makeMove(index) {
-      if (cells[index] !== null) return;
-      const cellEl = board.children[index];
-      cells[index] = currentPlayer;
-      cellEl.textContent = currentPlayer;
-
-      if (checkWinner()) {
-        message.textContent = `Spieler ${currentPlayer} gewinnt!`;
-        disableBoard();
-        return;
-      }
-      if (cells.every(c => c !== null)) {
-        message.textContent = "Unentschieden!";
-        return;
-      }
-      currentPlayer = currentPlayer === "X" ? "O" : "X";
-      message.textContent = `Spieler ${currentPlayer} ist dran`;
+    function move(i,cEl){
+      if(cells[i]) return;
+      cells[i]=current; cEl.textContent=current;
+      if(check()) { msg.textContent=`${current} gewinnt!`; return; }
+      if(cells.every(x=>x)) { msg.textContent="Unentschieden!"; return; }
+      current=current==="X"?"O":"X"; msg.textContent=`Spieler ${current} ist dran`;
     }
-
-    function checkWinner() {
-      const wins = [
-        [0,1,2], [3,4,5], [6,7,8],
-        [0,3,6], [1,4,7], [2,5,8],
-        [0,4,8], [2,4,6]
-      ];
-      return wins.some(([a,b,c]) => cells[a] && cells[a] === cells[b] && cells[a] === cells[c]);
+    function check(){
+      const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+      return wins.some(([a,b,c])=>cells[a] && cells[a]===cells[b]&&cells[a]===cells[c]);
     }
-
-    function disableBoard() {
-      for (let i = 0; i < 9; i++) {
-        board.children[i].style.pointerEvents = "none";
-      }
-    }
-
-    // Spiel bei Laden starten
     startGame();
   </script>
 </body>
