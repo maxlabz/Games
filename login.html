@@ -1,28 +1,109 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
-  <title>Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login – MaxLabz Games</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #f1f1f1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    header h1 {
+      font-size: 2rem;
+      color: #4CAF50;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    form {
+      background: #1f1f1f;
+      padding: 30px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
+    }
+    form h2 {
+      margin-bottom: 20px;
+      color: #4CAF50;
+      text-align: center;
+    }
+    form input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      background: #2a2a2a;
+      color: #f1f1f1;
+    }
+    form button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      background: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      color: #121212;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    form button:hover {
+      background: #3e8e41;
+    }
+    .link {
+      margin-top: 15px;
+      text-align: center;
+    }
+    .link a {
+      color: #4CAF50;
+      text-decoration: none;
+    }
+    .link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Login</h1>
+  </header>
+
+  <form id="loginForm">
+    <h2>Willkommen zurück</h2>
+    <input type="email" id="email" placeholder="E-Mail" required>
+    <input type="password" id="password" placeholder="Passwort" required>
+    <button type="submit">Einloggen</button>
+    <div class="link">
+      Noch kein Konto? <a href="register.html">Registrieren</a>
+    </div>
+  </form>
+
   <script type="module">
     import { auth } from './firebase-init.js';
     import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-    window.loginUser = function () {
+    document.getElementById("loginForm").addEventListener("submit", e => {
+      e.preventDefault();
       const email = document.getElementById("email").value;
-      const pass = document.getElementById("password").value;
-      signInWithEmailAndPassword(auth, email, pass)
+      const password = document.getElementById("password").value;
+      signInWithEmailAndPassword(auth, email, password)
         .then(() => {
           alert("Login erfolgreich!");
           window.location.href = "index.html";
         })
-        .catch((err) => alert("Fehler: " + err.message));
-    }
+        .catch(err => alert("Fehler: " + err.message));
+    });
   </script>
-</head>
-<body>
-  <h1>Login</h1>
-  <input id="email" placeholder="E-Mail"><br>
-  <input id="password" type="password" placeholder="Passwort"><br>
-  <button onclick="loginUser()">Login</button>
-  <p>Kein Konto? <a href="register.html">Registrieren</a></p>
+
 </body>
 </html>
