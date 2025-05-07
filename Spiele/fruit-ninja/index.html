@@ -1,51 +1,245 @@
-<!-- spiele/fruit-ninja/index.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Fruit Ninja</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fruit Ninja – MaxLabz Games</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f8f8f8;
-      text-align: center;
-      padding: 20px;
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:Arial,sans-serif; background:#121212; color:#f1f1f1; }
+    a { color:#4CAF50; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+
+    header {
+      background:#111;
+      padding:20px;
+      text-align:center;
     }
-    h1 {
-      margin-bottom: 20px;
-      color: #4CAF50;
+    header h1 {
+      color:#4CAF50;
+      margin:0;
     }
-    #game-container {
-      width: 600px;
-      height: 400px;
-      border: 3px dashed #4CAF50;
-      background-color: #000;
-      margin: 0 auto;
+    nav {
+      background:#1a1a1a;
+      padding:10px;
+      display:flex;
+      justify-content:center;
+      gap:15px;
+    }
+    nav a {
+      font-weight:bold;
+      padding:5px 10px;
+    }
+
+    main {
+      max-width:600px;
+      margin:20px auto;
       position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
-    #game-container p {
-      color: white;
-      font-size: 1.5em;
+    #game-canvas {
+      width:100%;
+      height:auto;
+      background:#000;
+      display:block;
+      border:3px solid #4CAF50;
+      border-radius:10px;
     }
-    a {
-      display: block;
-      margin-top: 30px;
-      color: #4CAF50;
-      text-decoration: none;
+    #hud {
+      position:absolute;
+      top:10px;
+      left:10px;
+      color:#fff;
+      font-size:1.1rem;
+      text-shadow:0 0 5px #000;
     }
-    a:hover {
-      text-decoration: underline;
+    #hud span { margin-right:20px; }
+
+    footer {
+      text-align:center;
+      padding:20px;
+      color:#777;
+      margin-top:20px;
     }
   </style>
 </head>
 <body>
-  <h1>Fruit Ninja</h1>
-  <div id="game-container">
-    <p>Das Spiel ist noch in Entwicklung! &#127822;</p>
-  </div>
-  <a href="../../index.html">← Zurück zur Startseite</a>
+
+  <header>
+    <h1>Fruit Ninja</h1>
+  </header>
+  <nav>
+    <a href="../../index.html">Startseite</a>
+    <a href="../Memory/index.html">Memory</a>
+    <a href="../Quiz/index.html">Quiz</a>
+    <a href="../Snake/index.html">Snake</a>
+    <a href="../Tic-tac-Toe/index.html">Tic Tac Toe</a>
+  </nav>
+
+  <main>
+    <div id="hud">
+      <span id="score">Score: 0</span>
+      <span id="lives">Lives: 3</span>
+    </div>
+    <canvas id="game-canvas" width="600" height="400"></canvas>
+  </main>
+
+  <footer>
+    &copy; 2025 MaxLabz Games
+  </footer>
+
+  <script>
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const livesEl = document.getElementById('lives');
+
+    const gravity = 0.15;
+    const spawnInterval = 1000; // ms
+    const maxLives = 3;
+    let score = 0, lives = maxLives;
+    let fruits = [], pointer = [];
+    let lastSpawn = 0;
+
+    class Fruit {
+      constructor() {
+        this.radius = 20;
+        this.x = Math.random() * (canvas.width - 2 * this.radius) + this.radius;
+        this.y = canvas.height + this.radius;
+        this.vx = (Math.random() - 0.5) * 4;
+        this.vy = - (Math.random() * 6 + 8);
+        this.color = ['#e74c3c','#f1c40f','#2ecc71','#9b59b6'][Math.floor(Math.random()*4)];
+        this.sliced = false;
+      }
+      update() {
+        this.vy += gravity;
+        this.x += this.vx;
+        this.y += this.vy;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.fillStyle = this.color;
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+        ctx.fill();
+      }
+      offScreen() {
+        return this.y - this.radius > canvas.height;
+      }
+    }
+
+    function spawnFruit() {
+      fruits.push(new Fruit());
+    }
+
+    function drawFruits() {
+      fruits.forEach(f => f.draw());
+    }
+
+    function updateFruits(delta) {
+      fruits.forEach(f => f.update());
+      // remove off-screen
+      fruits = fruits.filter(f => {
+        if (f.offScreen() && !f.sliced) {
+          lives--;
+          updateHUD();
+          return false;
+        }
+        return !f.offScreen();
+      });
+    }
+
+    function updateHUD() {
+      scoreEl.textContent = 'Score: ' + score;
+      livesEl.textContent = 'Lives: ' + lives;
+      if (lives <= 0) gameOver();
+    }
+
+    function gameOver() {
+      cancelAnimationFrame(rafId);
+      ctx.fillStyle = 'rgba(0,0,0,0.7)';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = '#fff';
+      ctx.font = '48px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('Game Over', canvas.width/2, canvas.height/2 - 20);
+      ctx.font = '24px Arial';
+      ctx.fillText('Final Score: ' + score, canvas.width/2, canvas.height/2 + 20);
+    }
+
+    // Pointer tracking
+    canvas.addEventListener('mousemove', e => addPointer(e.offsetX, e.offsetY));
+    canvas.addEventListener('touchmove', e => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      for (let t of e.touches) {
+        addPointer(t.clientX - rect.left, t.clientY - rect.top);
+      }
+    }, { passive: false });
+
+    function addPointer(x, y) {
+      pointer.push({x,y, time: Date.now()});
+      // keep only last 100ms
+      const cutoff = Date.now() - 100;
+      pointer = pointer.filter(p => p.time > cutoff);
+    }
+
+    function checkSlices() {
+      if (pointer.length < 2) return;
+      for (let f of fruits) {
+        if (f.sliced) continue;
+        for (let i = 0; i < pointer.length - 1; i++) {
+          const p1 = pointer[i], p2 = pointer[i+1];
+          // distance from circle center to segment
+          const dx = p2.x - p1.x, dy = p2.y - p1.y;
+          const t = ((f.x - p1.x)*dx + (f.y - p1.y)*dy) / (dx*dx + dy*dy);
+          const nearest = {
+            x: p1.x + t*dx,
+            y: p1.y + t*dy
+          };
+          const dist = Math.hypot(f.x - nearest.x, f.y - nearest.y);
+          if (dist < f.radius) {
+            f.sliced = true;
+            score++;
+            updateHUD();
+            break;
+          }
+        }
+      }
+      // remove sliced fruits
+      fruits = fruits.filter(f => !f.sliced);
+    }
+
+    let lastTime = 0, rafId;
+    function loop(ts) {
+      const delta = ts - lastTime;
+      lastTime = ts;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      // spawn
+      if (ts - lastSpawn > spawnInterval) {
+        spawnFruit();
+        lastSpawn = ts;
+      }
+
+      updateFruits(delta);
+      drawFruits();
+      checkSlices();
+
+      // draw slice trail
+      if (pointer.length > 1) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(pointer[0].x, pointer[0].y);
+        for (let p of pointer) ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+      }
+
+      rafId = requestAnimationFrame(loop);
+    }
+
+    // start game
+    updateHUD();
+    requestAnimationFrame(loop);
+  </script>
 </body>
 </html>
