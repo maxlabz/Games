@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cookie Clicker – MaxLabz Games</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #222;
+      color: #f1f1f1;
+      text-align: center;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: #111;
+      padding: 20px;
+    }
+    header h1 {
+      color: #4CAF50;
+      margin: 0;
+    }
+    nav {
+      background: #1a1a1a;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    nav a {
+      color: #f1f1f1;
+      font-weight: bold;
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color .3s;
+    }
+    nav a:hover {
+      color: #4CAF50;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #cookie {
+      font-size: 5rem;
+      cursor: pointer;
+      user-select: none;
+      transition: transform .1s;
+    }
+    #cookie:active {
+      transform: scale(0.9);
+    }
+    #counter {
+      margin-top: 20px;
+      font-size: 2rem;
+      color: #4CAF50;
+    }
+    footer {
+      background: #111;
+      padding: 15px;
+      font-size: 0.9rem;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Cookie Clicker</h1>
+  </header>
+
+  <nav>
+    <a href="../../index.html">Startseite</a>
+    <a href="../Memory/index.html">Memory</a>
+    <a href="../Quiz/index.html">Quiz</a>
+    <a href="../Snake/index.html">Snake</a>
+    <a href="../Tic-tac-Toe/index.html">Tic Tac Toe</a>
+    <a href="../fruit-ninja/index.html">Fruit Ninja</a>
+  </nav>
+
+  <main>
+    <div id="cookie">🍪</div>
+    <div id="counter">Cookies: 0</div>
+  </main>
+
+  <footer>&copy; 2025 MaxLabz Games</footer>
+
+  <script>
+    const cookie = document.getElementById('cookie');
+    const counter = document.getElementById('counter');
+    let count = 0;
+
+    cookie.addEventListener('click', () => {
+      count++;
+      counter.textContent = 'Cookies: ' + count;
+    });
+  </script>
+</body>
+</html>
