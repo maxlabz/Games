@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profil & Highscores – MaxLabz Games</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:Arial,sans-serif; background:#121212; color:#f1f1f1; }
+    header, footer { text-align:center; padding:20px; }
+    header h1 { color:#4CAF50; margin-bottom:10px; }
+    nav.tabs { display:flex; justify-content:center; gap:10px; margin-bottom:20px; }
+    nav.tabs button {
+      background:#1f1f1f; border:none; padding:10px 20px;
+      color:#f1f1f1; cursor:pointer; border-radius:5px;
+      transition:background .3s;
+    }
+    nav.tabs button.active { background:#4CAF50; color:#121212; }
+    main { max-width:800px; margin:0 auto; padding:0 20px; }
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    th, td { padding:10px; text-align:left; border-bottom:1px solid #333; }
+    th { background:#1a1a1a; }
+  </style>
+</head>
+<body>
+
+  <!-- Firebase & Bereichsschutz -->
+  <script type="module" src="firebase-init.js"></script>
+  <script type="module">
+    import { auth } from './firebase-init.js';
+    import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+    onAuthStateChanged(auth, user => {
+      if (!user) window.location.href = 'login.html';
+    });
+  </script>
+
+  <header>
+    <h1>Dein Profil & Highscores</h1>
+  </header>
+
+  <!-- Tab-Navigation -->
+  <nav class="tabs" id="gameTabs">
+    <button data-game="Memory" class="active">Memory</button>
+    <button data-game="Quiz">Quiz</button>
+    <button data-game="Snake">Snake</button>
+    <button data-game="TicTacToe">Tic-Tac-Toe</button>
+    <button data-game="FruitNinja">Fruit Ninja</button>
+  </nav>
+
+  <main>
+    <table id="scoreTable">
+      <thead>
+        <tr><th>Platz</th><th>Spieler</th><th>Score</th><th>Datum</th></tr>
+      </thead>
+      <tbody><tr><td colspan="4">Lade Highscores…</td></tr></tbody>
+    </table>
+  </main>
+
+  <footer>&copy; 2025 MaxLabz Games</footer>
+
+  <!-- Highscores-Logik -->
+  <script type="module">
+    import { getTopScores } from './highscores.js';
+
+    const tabs = document.querySelectorAll('#gameTabs button');
+    const tbody = document.querySelector('#scoreTable tbody');
+
+    async function loadScores(game) {
+      tbody.innerHTML = '<tr><td colspan="4">Lade Highscores…</td></tr>';
+      const scores = await getTopScores(game);
+      if (!scores.length) {
+        tbody.innerHTML = '<tr><td colspan="4">Noch keine Einträge.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = scores.map((s, i) => `
+        <tr>
+          <td>${i+1}</td>
+          <td>${s.user}</td>
+          <td>${s.score}</td>
+          <td>${new Date(s.timestamp.seconds * 1000).toLocaleString('de-DE')}</td>
+        </tr>
+      `).join('');
+    }
+
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabs.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        loadScores(btn.dataset.game);
+      });
+    });
+
+    // initial Memory laden
+    loadScores('Memory');
+  </script>
+</body>
+</html>
