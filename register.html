@@ -5,101 +5,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Registrieren – MaxLabz Games</title>
   <style>
-    /* Reset */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: Arial, sans-serif;
-      background: #121212;
-      color: #f1f1f1;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    header h1 {
-      font-size: 2rem;
-      color: #4CAF50;
-      margin-bottom: 30px;
-      text-align: center;
-    }
-    form {
-      background: #1f1f1f;
-      padding: 30px;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 400px;
-    }
-    form h2 {
-      margin-bottom: 20px;
-      color: #4CAF50;
-      text-align: center;
-    }
-    form input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 5px;
-      background: #2a2a2a;
-      color: #f1f1f1;
-    }
-    form button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 20px;
-      background: #4CAF50;
-      border: none;
-      border-radius: 5px;
-      color: #121212;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    form button:hover {
-      background: #3e8e41;
-    }
-    .link {
-      margin-top: 15px;
-      text-align: center;
-    }
-    .link a {
-      color: #4CAF50;
-      text-decoration: none;
-    }
-    .link a:hover {
-      text-decoration: underline;
-    }
+    /* wie schon zuvor */
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:Arial,sans-serif; background:#121212; color:#f1f1f1;
+           display:flex; align-items:center; justify-content:center; min-height:100vh; padding:20px; }
+    form { background:#1f1f1f; padding:30px; border-radius:10px; width:100%; max-width:400px; }
+    form h2 { color:#4CAF50; margin-bottom:20px; text-align:center; }
+    form input { width:100%; padding:12px; margin:10px 0; border:none; border-radius:5px; background:#2a2a2a; color:#f1f1f1; }
+    form button { width:100%; padding:12px; margin-top:20px; background:#4CAF50; border:none; border-radius:5px;
+                  color:#121212; font-weight:bold; cursor:pointer; transition:background .3s; }
+    form button:hover { background:#3e8e41; }
+    .link { margin-top:15px; text-align:center; }
+    .link a { color:#4CAF50; }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>Registrieren</h1>
-  </header>
-
   <form id="registerForm">
-    <h2>Neues Konto</h2>
+    <h2>Neues Konto erstellen</h2>
     <input type="email" id="email" placeholder="E-Mail" required>
     <input type="password" id="password" placeholder="Passwort" required>
     <button type="submit">Registrieren</button>
-    <div class="link">
-      Bereits registriert? <a href="login.html">Hier einloggen</a>
-    </div>
+    <div class="link">Schon registriert? <a href="login.html">Hier einloggen</a></div>
   </form>
 
   <script type="module">
     import { auth } from './firebase-init.js';
-    import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
 
-    document.getElementById("registerForm").addEventListener("submit", e => {
+    document.getElementById('registerForm').addEventListener('submit', e => {
       e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(() => alert("Registrierung erfolgreich!"))
-        .catch(err => alert("Fehler: " + err.message));
+      createUserWithEmailAndPassword(
+        auth,
+        document.getElementById('email').value,
+        document.getElementById('password').value
+      )
+      .then(() => alert('Registrierung erfolgreich!'))
+      .catch(err => alert('Fehler: ' + err.message));
     });
   </script>
 
