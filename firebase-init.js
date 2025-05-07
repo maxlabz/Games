@@ -7,7 +7,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAkn0SMPvYAw2eWmCUp2rCf3Y4FFpVxCBI",
   authDomain: "meine-eigene-spiel-webseite.firebaseapp.com",
   projectId: "meine-eigene-spiel-webseite",
-  storageBucket: "meine-eigene-spiel-webseite.firebasestorage.app",
+  storageBucket: "meine-eigene-spiel-webseite.appsort.com",
   messagingSenderId: "825319937465",
   appId: "1:825319937465:web:b53b568f9bb65f0d639268",
   measurementId: "G-XZ5FQC3Z2E"
