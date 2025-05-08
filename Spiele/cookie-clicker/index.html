@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cookie Clicker – MaxLabz Games</title>
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: Arial, sans-serif;
-      background: #222;
+      background: #121212;
       color: #f1f1f1;
-      text-align: center;
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
+      min-height: 100vh;
+      text-align: center;
     }
     header {
       background: #111;
@@ -35,7 +35,7 @@
       font-weight: bold;
       text-decoration: none;
       padding: 5px 10px;
-      transition: color .3s;
+      transition: color 0.3s;
     }
     nav a:hover {
       color: #4CAF50;
@@ -45,22 +45,45 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       padding: 20px;
     }
     #cookie {
-      font-size: 5rem;
+      font-size: 6rem;
       cursor: pointer;
       user-select: none;
-      transition: transform .1s;
-    }
-    #cookie:active {
-      transform: scale(0.9);
+      margin-top: 30px;
     }
     #counter {
-      margin-top: 20px;
+      margin: 15px 0;
       font-size: 2rem;
       color: #4CAF50;
+    }
+    #shop {
+      margin-top: 40px;
+      background: #1f1f1f;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+    }
+    .item {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+      padding: 10px;
+      background: #2a2a2a;
+      border-radius: 6px;
+    }
+    .item button {
+      background: #4CAF50;
+      color: black;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .item button:hover {
+      background: #45a049;
     }
     footer {
       background: #111;
@@ -88,19 +111,65 @@
   <main>
     <div id="cookie">🍪</div>
     <div id="counter">Cookies: 0</div>
+
+    <div id="shop">
+      <h2>Shop</h2>
+      <div class="item">
+        <span>+1 CPS (10 Cookies)</span>
+        <button onclick="buyItem(0)">Kaufen</button>
+      </div>
+      <div class="item">
+        <span>+5 CPS (50 Cookies)</span>
+        <button onclick="buyItem(1)">Kaufen</button>
+      </div>
+      <div class="item">
+        <span>+10 CPS (100 Cookies)</span>
+        <button onclick="buyItem(2)">Kaufen</button>
+      </div>
+    </div>
   </main>
 
   <footer>&copy; 2025 MaxLabz Games</footer>
 
   <script>
-    const cookie = document.getElementById('cookie');
-    const counter = document.getElementById('counter');
-    let count = 0;
+    let cookies = 0;
+    let cps = 0;
+    const counter = document.getElementById("counter");
+    const cookie = document.getElementById("cookie");
 
-    cookie.addEventListener('click', () => {
-      count++;
-      counter.textContent = 'Cookies: ' + count;
+    const shopItems = [
+      { cost: 10, gain: 1 },
+      { cost: 50, gain: 5 },
+      { cost: 100, gain: 10 }
+    ];
+
+    cookie.addEventListener("click", () => {
+      cookies++;
+      updateDisplay();
     });
+
+    function updateDisplay() {
+      counter.textContent = `Cookies: ${cookies} | CPS: ${cps}`;
+    }
+
+    function buyItem(index) {
+      const item = shopItems[index];
+      if (cookies >= item.cost) {
+        cookies -= item.cost;
+        cps += item.gain;
+        updateDisplay();
+      } else {
+        alert("Nicht genug Cookies!");
+      }
+    }
+
+    setInterval(() => {
+      cookies += cps;
+      updateDisplay();
+    }, 1000);
+
+    updateDisplay();
   </script>
+
 </body>
 </html>
