@@ -76,7 +76,18 @@
       font-size: 0.9rem;
       color: #777;
     }
-  </style>
+  <style>
+  @keyframes pop {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .logo {
+    animation: pop 0.6s ease-out;
+  }
+</style>
+
+<img src="logo.png" alt="Logo" class="logo" style="width: 200px; height: auto; border-radius: 12px; display: block; margin: 40px auto 20px auto;" />
 </head>
 <body>
 
@@ -84,7 +95,7 @@
   <script type="module" src="firebase-init.js"></script>
 
   <header>
-  <img src="logo.png" alt="Logo" style="width: 200px; height: auto; border-radius: 12px; display: block; margin: 30px auto;" />
+<img src="logo.png" alt="Logo" style="width: 200px; height: auto; border-radius: 12px; display: block; margin: 40px auto 20px auto;" />
 </header>
 
   <nav class="main-nav">
