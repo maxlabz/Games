@@ -1,50 +1,70 @@
 // nachrichten.js
-import { db, auth } from './firebase-init.js';
-import {
-  collection, addDoc, query, where, onSnapshot, serverTimestamp
-} from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
-import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+import { getFirestore, collection, addDoc, query, where, onSnapshot, orderBy } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
 
+// Firebase-Konfiguration (deine echten Werte hier eingetragen)
+const firebaseConfig = {
+  apiKey: "AIzaSyAkn0SMPvYAw2eWmCUp2rCf3Y4FFpVxCBI",
+  authDomain: "meine-eigene-spiel-webseite.firebaseapp.com",
+  projectId: "meine-eigene-spiel-webseite",
+  storageBucket: "meine-eigene-spiel-webseite.firebasestorage.app",
+  messagingSenderId: "825319937465",
+  appId: "1:825319937465:web:b53b568f9bb65f0d639268",
+  measurementId: "G-XZ5FQC3Z2E"
+};
+
+// Initialisierung
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// Formular & Posteingang
 const form = document.getElementById('messageForm');
+const recipientInput = document.getElementById('recipient');
+const messageInput = document.getElementById('message');
 const inbox = document.getElementById('inbox');
 
 onAuthStateChanged(auth, user => {
   if (!user) return;
 
-  // Nachrichten abrufen
-  const q = query(collection(db, 'nachrichten'), where('empfaenger', '==', user.email));
-  onSnapshot(q, snapshot => {
-    inbox.innerHTML = '';
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const li = document.createElement('li');
-      li.textContent = `Von ${data.absender}: ${data.text}`;
-      inbox.appendChild(li);
-    });
-  });
+  const userEmail = user.email;
 
-  // Nachricht senden
-  form.addEventListener('submit', async e => {
+  // Nachrichten absenden
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const empfaenger = document.getElementById('recipient').value.trim();
-    const text = document.getElementById('message').value.trim();
+    const recipient = recipientInput.value.trim();
+    const text = messageInput.value.trim();
 
-    if (!empfaenger || !text) {
-      return alert("Bitte Empfänger und Nachricht ausfüllen");
-    }
+    if (!recipient || !text) return;
 
     try {
       await addDoc(collection(db, 'nachrichten'), {
-        absender: user.email,
-        empfaenger,
-        text,
-        zeitstempel: serverTimestamp()
+        sender: userEmail,
+        recipient: recipient,
+        message: text,
+        timestamp: new Date()
       });
-      form.reset();
-      alert('Nachricht gesendet!');
+      messageInput.value = '';
     } catch (err) {
       console.error('Fehler beim Senden:', err);
-      alert('Fehler beim Senden der Nachricht');
     }
+  });
+
+  // Posteingang abonnieren
+  const q = query(
+    collection(db, 'nachrichten'),
+    where('recipient', '==', userEmail),
+    orderBy('timestamp', 'desc')
+  );
+
+  onSnapshot(q, (snapshot) => {
+    inbox.innerHTML = '';
+    snapshot.forEach(doc => {
+      const msg = doc.data();
+      const li = document.createElement('li');
+      li.textContent = `Von ${msg.sender}: ${msg.message}`;
+      inbox.appendChild(li);
+    });
   });
 });
