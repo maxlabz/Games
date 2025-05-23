@@ -1,25 +1,18 @@
 // nachrichten.js
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
-import { getFirestore, collection, addDoc, query, where, onSnapshot, orderBy } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
-import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+import { db, auth } from './firebase-init.js';
+import {
+  collection,
+  addDoc,
+  query,
+  where,
+  orderBy,
+  onSnapshot
+} from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+import {
+  onAuthStateChanged
+} from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
 
-// Firebase-Konfiguration (deine echten Werte hier eingetragen)
-const firebaseConfig = {
-  apiKey: "AIzaSyAkn0SMPvYAw2eWmCUp2rCf3Y4FFpVxCBI",
-  authDomain: "meine-eigene-spiel-webseite.firebaseapp.com",
-  projectId: "meine-eigene-spiel-webseite",
-  storageBucket: "meine-eigene-spiel-webseite.firebasestorage.app",
-  messagingSenderId: "825319937465",
-  appId: "1:825319937465:web:b53b568f9bb65f0d639268",
-  measurementId: "G-XZ5FQC3Z2E"
-};
-
-// Initialisierung
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-
-// Formular & Posteingang
+// HTML-Elemente
 const form = document.getElementById('messageForm');
 const recipientInput = document.getElementById('recipient');
 const messageInput = document.getElementById('message');
@@ -30,7 +23,7 @@ onAuthStateChanged(auth, user => {
 
   const userEmail = user.email;
 
-  // Nachrichten absenden
+  // Nachricht senden
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const recipient = recipientInput.value.trim();
@@ -41,17 +34,17 @@ onAuthStateChanged(auth, user => {
     try {
       await addDoc(collection(db, 'nachrichten'), {
         sender: userEmail,
-        recipient: recipient,
+        recipient,
         message: text,
         timestamp: new Date()
       });
       messageInput.value = '';
-    } catch (err) {
-      console.error('Fehler beim Senden:', err);
+    } catch (error) {
+      console.error('Fehler beim Senden:', error);
     }
   });
 
-  // Posteingang abonnieren
+  // Nachrichten empfangen
   const q = query(
     collection(db, 'nachrichten'),
     where('recipient', '==', userEmail),
