@@ -1,19 +1,20 @@
 // firebase-init.js
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
-import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 import { getAuth } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 
 const firebaseConfig = {
-  apiKey: "DEIN_API_KEY",
-  authDomain: "DEIN_AUTH_DOMAIN",
-  projectId: "DEIN_PROJECT_ID",
-  storageBucket: "DEIN_BUCKET",
-  messagingSenderId: "DEIN_SENDER_ID",
-  appId: "DEINE_APP_ID"
+  apiKey: "AIzaSyAkn0SMPvYAw2eWmCUp2rCf3Y4FFpVxCBI",
+  authDomain: "meine-eigene-spiel-webseite.firebaseapp.com",
+  projectId: "meine-eigene-spiel-webseite",
+  storageBucket: "meine-eigene-spiel-webseite.firebasestorage.app",
+  messagingSenderId: "825319937465",
+  appId: "1:825319937465:web:b53b568f9bb65f0d639268",
+  measurementId: "G-XZ5FQC3Z2E"
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-export { db, auth };
+export { auth, db };
