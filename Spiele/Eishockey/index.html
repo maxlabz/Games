@@ -1,204 +1,229 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Eishockey – MaxLabz Games</title>
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #121212;
-      color: #fff;
+      background-color: #121212;
+      color: #f1f1f1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
-    header {
-      background: #1f1f1f;
-      padding: 10px 20px;
-      text-align: center;
-      color: #4CAF50;
-      font-size: 24px;
-    }
+
     nav {
-      text-align: center;
-      margin: 10px 0;
+      background-color: #1f1f1f;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    nav a {
+
+    nav h1 {
       color: #4CAF50;
-      text-decoration: none;
-      font-weight: bold;
-      margin: 0 10px;
-    }
-    canvas {
-      display: block;
-      margin: 20px auto;
-      background: #000;
-      border: 2px solid #4CAF50;
-    }
-    .score {
-      text-align: center;
       font-size: 20px;
-      margin-top: 10px;
+      margin: 0;
     }
-    .controls {
-      text-align: center;
-      margin-top: 15px;
+
+    nav a {
+      color: #f1f1f1;
+      text-decoration: none;
+      margin-left: 15px;
     }
-    .controls select, .controls button {
-      background: #1f1f1f;
-      color: #4CAF50;
-      padding: 8px 12px;
-      border: 1px solid #4CAF50;
-      border-radius: 5px;
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    canvas {
+      background: #222;
+      border: 2px solid #4CAF50;
+      touch-action: none;
+    }
+
+    .scoreboard {
+      margin: 10px 0;
+      font-size: 18px;
+    }
+
+    .buttons {
+      margin: 10px;
+    }
+
+    .buttons button {
+      background: #4CAF50;
+      border: none;
+      color: #121212;
+      padding: 10px 20px;
       margin: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .buttons button:hover {
+      background: #3e8e41;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      background-color: #1f1f1f;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <header>Eishockey</header>
-  <nav><a href="../../index.html">Zurück zur Startseite</a></nav>
-  <div class="controls">
-    <label>Modus:</label>
-    <select id="mode">
-      <option value="cpu">Spieler vs. Computer</option>
-      <option value="pvp">Spieler vs. Spieler</option>
-    </select>
-    <label>Schwierigkeit:</label>
-    <select id="difficulty">
-      <option value="easy">Einfach</option>
-      <option value="medium" selected>Mittel</option>
-      <option value="hard">Schwer</option>
-    </select>
-    <button onclick="startGame()">Spiel starten</button>
-  </div>
 
-  <div class="score" id="score">Spieler 1: 0 | Spieler 2: 0</div>
-  <canvas id="gameCanvas" width="600" height="400"></canvas>
+  <nav>
+    <h1>MaxLabz Games</h1>
+    <div>
+      <a href="../../index.html">Startseite</a>
+      <a href="../TicTacToe/index.html">Tic Tac Toe</a>
+      <a href="../Snake/index.html">Snake</a>
+      <a href="../Memory/index.html">Memory</a>
+      <a href="../Quiz/index.html">Quiz</a>
+      <a href="../FruitNinja/index.html">Fruit Ninja</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="scoreboard" id="score">Spieler 1: 0 | Spieler 2: 0</div>
+    <div class="buttons">
+      <button onclick="startGame('2p')">2 Spieler</button>
+      <button onclick="startGame('easy')">Gegen Computer (Leicht)</button>
+      <button onclick="startGame('hard')">Gegen Computer (Schwer)</button>
+    </div>
+    <canvas id="gameCanvas" width="600" height="400"></canvas>
+  </main>
+
+  <footer>&copy; 2025 MaxLabz Games</footer>
 
   <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const scoreDisplay = document.getElementById('score');
-    let mode = 'cpu';
-    let difficulty = 'medium';
-    let gameInterval;
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
 
-    const paddleWidth = 10, paddleHeight = 70, puckSize = 10;
-    let leftPaddle = { x: 20, y: 160, dy: 0 };
-    let rightPaddle = { x: 570, y: 160, dy: 0 };
-    let puck = { x: 295, y: 195, dx: 4, dy: 3 };
-
-    let score1 = 0, score2 = 0;
+    let gameMode = '2p';
+    let player1 = { x: 50, y: 150, width: 10, height: 100, score: 0 };
+    let player2 = { x: 540, y: 150, width: 10, height: 100, score: 0 };
+    let puck = { x: 300, y: 200, radius: 10, dx: 4, dy: 4 };
+    let keys = {};
+    let aiSpeed = 3;
 
     function resetPuck() {
-      puck.x = 295;
-      puck.y = 195;
-      puck.dx = Math.random() < 0.5 ? -4 : 4;
-      puck.dy = (Math.random() * 4 - 2);
+      puck.x = canvas.width / 2;
+      puck.y = canvas.height / 2;
+      puck.dx = (Math.random() > 0.5 ? 4 : -4);
+      puck.dy = (Math.random() > 0.5 ? 4 : -4);
     }
 
-    function drawPaddle(p) {
-      ctx.fillStyle = '#4CAF50';
-      ctx.fillRect(p.x, p.y, paddleWidth, paddleHeight);
-    }
-
-    function drawPuck() {
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(puck.x, puck.y, puckSize, puckSize);
-    }
-
-    function updateAI() {
-      const error = difficulty === 'easy' ? 30 : difficulty === 'medium' ? 15 : 5;
-      if (puck.y + puckSize / 2 > rightPaddle.y + paddleHeight / 2 + error) {
-        rightPaddle.dy = 3;
-      } else if (puck.y + puckSize / 2 < rightPaddle.y + paddleHeight / 2 - error) {
-        rightPaddle.dy = -3;
-      } else {
-        rightPaddle.dy = 0;
-      }
-      rightPaddle.y += rightPaddle.dy;
-    }
-
-    function update() {
-      leftPaddle.y += leftPaddle.dy;
-      if (mode === 'cpu') updateAI();
-      else rightPaddle.y += rightPaddle.dy;
-
-      puck.x += puck.dx;
-      puck.y += puck.dy;
-
-      // Wände
-      if (puck.y <= 0 || puck.y + puckSize >= canvas.height) puck.dy *= -1;
-
-      // Kollision Paddles
-      if (
-        puck.x <= leftPaddle.x + paddleWidth &&
-        puck.y + puckSize > leftPaddle.y &&
-        puck.y < leftPaddle.y + paddleHeight
-      ) {
-        puck.dx *= -1;
-      }
-
-      if (
-        puck.x + puckSize >= rightPaddle.x &&
-        puck.y + puckSize > rightPaddle.y &&
-        puck.y < rightPaddle.y + paddleHeight
-      ) {
-        puck.dx *= -1;
-      }
-
-      // Punkte
-      if (puck.x < 0) {
-        score2++;
-        updateScore();
-        resetPuck();
-      }
-      if (puck.x > canvas.width) {
-        score1++;
-        updateScore();
-        resetPuck();
-      }
+    function updateScoreboard() {
+      document.getElementById("score").textContent = `Spieler 1: ${player1.score} | Spieler 2: ${player2.score}`;
     }
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawPaddle(leftPaddle);
-      drawPaddle(rightPaddle);
-      drawPuck();
+
+      ctx.fillStyle = "#4CAF50";
+      ctx.fillRect(player1.x, player1.y, player1.width, player1.height);
+      ctx.fillRect(player2.x, player2.y, player2.width, player2.height);
+
+      ctx.beginPath();
+      ctx.arc(puck.x, puck.y, puck.radius, 0, Math.PI * 2);
+      ctx.fillStyle = "#f1f1f1";
+      ctx.fill();
+
+      // Update puck
+      puck.x += puck.dx;
+      puck.y += puck.dy;
+
+      // Collision mit oben/unten
+      if (puck.y - puck.radius < 0 || puck.y + puck.radius > canvas.height) {
+        puck.dy *= -1;
+      }
+
+      // Paddle Collision
+      if (
+        puck.x - puck.radius < player1.x + player1.width &&
+        puck.y > player1.y &&
+        puck.y < player1.y + player1.height
+      ) puck.dx *= -1;
+
+      if (
+        puck.x + puck.radius > player2.x &&
+        puck.y > player2.y &&
+        puck.y < player2.y + player2.height
+      ) puck.dx *= -1;
+
+      // Punkte
+      if (puck.x < 0) {
+        player2.score++;
+        updateScoreboard();
+        resetPuck();
+      }
+      if (puck.x > canvas.width) {
+        player1.score++;
+        updateScoreboard();
+        resetPuck();
+      }
+
+      // Steuerung
+      if (keys["w"]) player1.y -= 6;
+      if (keys["s"]) player1.y += 6;
+      if (gameMode === "2p") {
+        if (keys["ArrowUp"]) player2.y -= 6;
+        if (keys["ArrowDown"]) player2.y += 6;
+      } else {
+        // KI
+        const center = player2.y + player2.height / 2;
+        if (gameMode === "easy") {
+          if (center < puck.y - 10) player2.y += 2;
+          else if (center > puck.y + 10) player2.y -= 2;
+        } else {
+          if (center < puck.y - 10) player2.y += aiSpeed;
+          else if (center > puck.y + 10) player2.y -= aiSpeed;
+        }
+      }
+
+      // Begrenzung
+      player1.y = Math.max(0, Math.min(canvas.height - player1.height, player1.y));
+      player2.y = Math.max(0, Math.min(canvas.height - player2.height, player2.y));
+
+      requestAnimationFrame(draw);
     }
 
-    function loop() {
-      update();
-      draw();
-    }
-
-    function updateScore() {
-      scoreDisplay.textContent = `Spieler 1: ${score1} | Spieler 2: ${score2}`;
-    }
-
-    function startGame() {
-      clearInterval(gameInterval);
-      score1 = score2 = 0;
-      updateScore();
+    function startGame(mode) {
+      gameMode = mode;
+      player1.score = 0;
+      player2.score = 0;
+      updateScoreboard();
       resetPuck();
-      leftPaddle.y = 160;
-      rightPaddle.y = 160;
-      mode = document.getElementById('mode').value;
-      difficulty = document.getElementById('difficulty').value;
-      gameInterval = setInterval(loop, 1000 / 60);
+      if (mode === "hard") aiSpeed = 5;
+      else aiSpeed = 3;
     }
 
-    // Steuerung
-    document.addEventListener('keydown', e => {
-      if (e.key === 'w') leftPaddle.dy = -5;
-      if (e.key === 's') leftPaddle.dy = 5;
-      if (e.key === 'ArrowUp') rightPaddle.dy = -5;
-      if (e.key === 'ArrowDown') rightPaddle.dy = 5;
+    document.addEventListener("keydown", e => keys[e.key] = true);
+    document.addEventListener("keyup", e => keys[e.key] = false);
+
+    // Touch für Player 1
+    canvas.addEventListener("touchmove", function (e) {
+      let touch = e.touches[0];
+      let rect = canvas.getBoundingClientRect();
+      let y = touch.clientY - rect.top;
+      player1.y = y - player1.height / 2;
     });
 
-    document.addEventListener('keyup', e => {
-      if (e.key === 'w' || e.key === 's') leftPaddle.dy = 0;
-      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') rightPaddle.dy = 0;
-    });
+    resetPuck();
+    updateScoreboard();
+    draw();
   </script>
 </body>
 </html>
