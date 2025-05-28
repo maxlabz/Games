@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Eishockey – MaxLabz Games</title>
+  <style>
+    body {
+      margin: 0;
+      background: #121212;
+      color: #f1f1f1;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #4CAF50;
+      margin: 20px;
+    }
+
+    #gameCanvas {
+      background: #1f1f1f;
+      border: 3px solid #4CAF50;
+      margin-top: 20px;
+    }
+
+    .mode-buttons {
+      margin-top: 20px;
+    }
+
+    .mode-buttons button {
+      margin: 0 10px;
+      padding: 10px 20px;
+      font-weight: bold;
+      background: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      color: #121212;
+      cursor: pointer;
+    }
+
+    .mode-buttons button:hover {
+      background: #3e8e41;
+    }
+  </style>
+</head>
+<body>
+  <h1>Eishockey</h1>
+  <div class="mode-buttons">
+    <button onclick="startGame('player')">2-Spieler-Modus</button>
+    <button onclick="startGame('cpu')">Gegen Computer</button>
+  </div>
+  <canvas id="gameCanvas" width="600" height="400"></canvas>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const puck = { x: 300, y: 200, radius: 10, dx: 4, dy: 4 };
+    const paddle1 = { x: 20, y: 150, width: 10, height: 100, dy: 0 };
+    const paddle2 = { x: 570, y: 150, width: 10, height: 100, dy: 0 };
+    let mode = 'player'; // 'player' or 'cpu'
+    let gameRunning = false;
+
+    function drawPaddle(p) {
+      ctx.fillStyle = "#4CAF50";
+      ctx.fillRect(p.x, p.y, p.width, p.height);
+    }
+
+    function drawPuck() {
+      ctx.beginPath();
+      ctx.arc(puck.x, puck.y, puck.radius, 0, Math.PI * 2);
+      ctx.fillStyle = "#f1f1f1";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function movePaddles() {
+      paddle1.y += paddle1.dy;
+      if (mode === "player") {
+        paddle2.y += paddle2.dy;
+      } else {
+        // CPU-Steuerung
+        if (puck.y < paddle2.y + paddle2.height / 2) {
+          paddle2.y -= 3;
+        } else {
+          paddle2.y += 3;
+        }
+      }
+
+      // Begrenzung
+      paddle1.y = Math.max(0, Math.min(canvas.height - paddle1.height, paddle1.y));
+      paddle2.y = Math.max(0, Math.min(canvas.height - paddle2.height, paddle2.y));
+    }
+
+    function movePuck() {
+      puck.x += puck.dx;
+      puck.y += puck.dy;
+
+      // Wandkollision
+      if (puck.y <= 0 || puck.y >= canvas.height) puck.dy *= -1;
+
+      // Paddlekollision
+      if (
+        puck.x - puck.radius <= paddle1.x + paddle1.width &&
+        puck.y >= paddle1.y && puck.y <= paddle1.y + paddle1.height
+      ) {
+        puck.dx *= -1;
+        puck.x = paddle1.x + paddle1.width + puck.radius;
+      }
+
+      if (
+        puck.x + puck.radius >= paddle2.x &&
+        puck.y >= paddle2.y && puck.y <= paddle2.y + paddle2.height
+      ) {
+        puck.dx *= -1;
+        puck.x = paddle2.x - puck.radius;
+      }
+
+      // Tor
+      if (puck.x < 0 || puck.x > canvas.width) {
+        resetGame();
+      }
+    }
+
+    function resetGame() {
+      puck.x = canvas.width / 2;
+      puck.y = canvas.height / 2;
+      puck.dx *= -1;
+      puck.dy = 4;
+    }
+
+    function draw() {
+      if (!gameRunning) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawPaddle(paddle1);
+      drawPaddle(paddle2);
+      drawPuck();
+      movePaddles();
+      movePuck();
+      requestAnimationFrame(draw);
+    }
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "w") paddle1.dy = -5;
+      if (e.key === "s") paddle1.dy = 5;
+      if (mode === "player") {
+        if (e.key === "ArrowUp") paddle2.dy = -5;
+        if (e.key === "ArrowDown") paddle2.dy = 5;
+      }
+    });
+
+    document.addEventListener("keyup", e => {
+      if (e.key === "w" || e.key === "s") paddle1.dy = 0;
+      if (e.key === "ArrowUp" || e.key === "ArrowDown") paddle2.dy = 0;
+    });
+
+    function startGame(selectedMode) {
+      mode = selectedMode;
+      resetGame();
+      gameRunning = true;
+      draw();
+    }
+  </script>
+</body>
+</html>
