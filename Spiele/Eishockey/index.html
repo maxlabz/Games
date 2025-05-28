@@ -7,162 +7,198 @@
   <style>
     body {
       margin: 0;
-      background: #121212;
-      color: #f1f1f1;
       font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      background: #121212;
+      color: #fff;
     }
-
-    h1 {
-      color: #4CAF50;
-      margin: 20px;
-    }
-
-    #gameCanvas {
+    header {
       background: #1f1f1f;
-      border: 3px solid #4CAF50;
-      margin-top: 20px;
-    }
-
-    .mode-buttons {
-      margin-top: 20px;
-    }
-
-    .mode-buttons button {
-      margin: 0 10px;
       padding: 10px 20px;
-      font-weight: bold;
-      background: #4CAF50;
-      border: none;
-      border-radius: 5px;
-      color: #121212;
-      cursor: pointer;
+      text-align: center;
+      color: #4CAF50;
+      font-size: 24px;
     }
-
-    .mode-buttons button:hover {
-      background: #3e8e41;
+    nav {
+      text-align: center;
+      margin: 10px 0;
+    }
+    nav a {
+      color: #4CAF50;
+      text-decoration: none;
+      font-weight: bold;
+      margin: 0 10px;
+    }
+    canvas {
+      display: block;
+      margin: 20px auto;
+      background: #000;
+      border: 2px solid #4CAF50;
+    }
+    .score {
+      text-align: center;
+      font-size: 20px;
+      margin-top: 10px;
+    }
+    .controls {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .controls select, .controls button {
+      background: #1f1f1f;
+      color: #4CAF50;
+      padding: 8px 12px;
+      border: 1px solid #4CAF50;
+      border-radius: 5px;
+      margin: 5px;
     }
   </style>
 </head>
 <body>
-  <h1>Eishockey</h1>
-  <div class="mode-buttons">
-    <button onclick="startGame('player')">2-Spieler-Modus</button>
-    <button onclick="startGame('cpu')">Gegen Computer</button>
+  <header>Eishockey</header>
+  <nav><a href="../../index.html">Zurück zur Startseite</a></nav>
+  <div class="controls">
+    <label>Modus:</label>
+    <select id="mode">
+      <option value="cpu">Spieler vs. Computer</option>
+      <option value="pvp">Spieler vs. Spieler</option>
+    </select>
+    <label>Schwierigkeit:</label>
+    <select id="difficulty">
+      <option value="easy">Einfach</option>
+      <option value="medium" selected>Mittel</option>
+      <option value="hard">Schwer</option>
+    </select>
+    <button onclick="startGame()">Spiel starten</button>
   </div>
+
+  <div class="score" id="score">Spieler 1: 0 | Spieler 2: 0</div>
   <canvas id="gameCanvas" width="600" height="400"></canvas>
 
   <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('score');
+    let mode = 'cpu';
+    let difficulty = 'medium';
+    let gameInterval;
 
-    const puck = { x: 300, y: 200, radius: 10, dx: 4, dy: 4 };
-    const paddle1 = { x: 20, y: 150, width: 10, height: 100, dy: 0 };
-    const paddle2 = { x: 570, y: 150, width: 10, height: 100, dy: 0 };
-    let mode = 'player'; // 'player' or 'cpu'
-    let gameRunning = false;
+    const paddleWidth = 10, paddleHeight = 70, puckSize = 10;
+    let leftPaddle = { x: 20, y: 160, dy: 0 };
+    let rightPaddle = { x: 570, y: 160, dy: 0 };
+    let puck = { x: 295, y: 195, dx: 4, dy: 3 };
+
+    let score1 = 0, score2 = 0;
+
+    function resetPuck() {
+      puck.x = 295;
+      puck.y = 195;
+      puck.dx = Math.random() < 0.5 ? -4 : 4;
+      puck.dy = (Math.random() * 4 - 2);
+    }
 
     function drawPaddle(p) {
-      ctx.fillStyle = "#4CAF50";
-      ctx.fillRect(p.x, p.y, p.width, p.height);
+      ctx.fillStyle = '#4CAF50';
+      ctx.fillRect(p.x, p.y, paddleWidth, paddleHeight);
     }
 
     function drawPuck() {
-      ctx.beginPath();
-      ctx.arc(puck.x, puck.y, puck.radius, 0, Math.PI * 2);
-      ctx.fillStyle = "#f1f1f1";
-      ctx.fill();
-      ctx.closePath();
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(puck.x, puck.y, puckSize, puckSize);
     }
 
-    function movePaddles() {
-      paddle1.y += paddle1.dy;
-      if (mode === "player") {
-        paddle2.y += paddle2.dy;
+    function updateAI() {
+      const error = difficulty === 'easy' ? 30 : difficulty === 'medium' ? 15 : 5;
+      if (puck.y + puckSize / 2 > rightPaddle.y + paddleHeight / 2 + error) {
+        rightPaddle.dy = 3;
+      } else if (puck.y + puckSize / 2 < rightPaddle.y + paddleHeight / 2 - error) {
+        rightPaddle.dy = -3;
       } else {
-        // CPU-Steuerung
-        if (puck.y < paddle2.y + paddle2.height / 2) {
-          paddle2.y -= 3;
-        } else {
-          paddle2.y += 3;
-        }
+        rightPaddle.dy = 0;
       }
-
-      // Begrenzung
-      paddle1.y = Math.max(0, Math.min(canvas.height - paddle1.height, paddle1.y));
-      paddle2.y = Math.max(0, Math.min(canvas.height - paddle2.height, paddle2.y));
+      rightPaddle.y += rightPaddle.dy;
     }
 
-    function movePuck() {
+    function update() {
+      leftPaddle.y += leftPaddle.dy;
+      if (mode === 'cpu') updateAI();
+      else rightPaddle.y += rightPaddle.dy;
+
       puck.x += puck.dx;
       puck.y += puck.dy;
 
-      // Wandkollision
-      if (puck.y <= 0 || puck.y >= canvas.height) puck.dy *= -1;
+      // Wände
+      if (puck.y <= 0 || puck.y + puckSize >= canvas.height) puck.dy *= -1;
 
-      // Paddlekollision
+      // Kollision Paddles
       if (
-        puck.x - puck.radius <= paddle1.x + paddle1.width &&
-        puck.y >= paddle1.y && puck.y <= paddle1.y + paddle1.height
+        puck.x <= leftPaddle.x + paddleWidth &&
+        puck.y + puckSize > leftPaddle.y &&
+        puck.y < leftPaddle.y + paddleHeight
       ) {
         puck.dx *= -1;
-        puck.x = paddle1.x + paddle1.width + puck.radius;
       }
 
       if (
-        puck.x + puck.radius >= paddle2.x &&
-        puck.y >= paddle2.y && puck.y <= paddle2.y + paddle2.height
+        puck.x + puckSize >= rightPaddle.x &&
+        puck.y + puckSize > rightPaddle.y &&
+        puck.y < rightPaddle.y + paddleHeight
       ) {
         puck.dx *= -1;
-        puck.x = paddle2.x - puck.radius;
       }
 
-      // Tor
-      if (puck.x < 0 || puck.x > canvas.width) {
-        resetGame();
+      // Punkte
+      if (puck.x < 0) {
+        score2++;
+        updateScore();
+        resetPuck();
       }
-    }
-
-    function resetGame() {
-      puck.x = canvas.width / 2;
-      puck.y = canvas.height / 2;
-      puck.dx *= -1;
-      puck.dy = 4;
+      if (puck.x > canvas.width) {
+        score1++;
+        updateScore();
+        resetPuck();
+      }
     }
 
     function draw() {
-      if (!gameRunning) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawPaddle(paddle1);
-      drawPaddle(paddle2);
+      drawPaddle(leftPaddle);
+      drawPaddle(rightPaddle);
       drawPuck();
-      movePaddles();
-      movePuck();
-      requestAnimationFrame(draw);
     }
 
-    document.addEventListener("keydown", e => {
-      if (e.key === "w") paddle1.dy = -5;
-      if (e.key === "s") paddle1.dy = 5;
-      if (mode === "player") {
-        if (e.key === "ArrowUp") paddle2.dy = -5;
-        if (e.key === "ArrowDown") paddle2.dy = 5;
-      }
-    });
-
-    document.addEventListener("keyup", e => {
-      if (e.key === "w" || e.key === "s") paddle1.dy = 0;
-      if (e.key === "ArrowUp" || e.key === "ArrowDown") paddle2.dy = 0;
-    });
-
-    function startGame(selectedMode) {
-      mode = selectedMode;
-      resetGame();
-      gameRunning = true;
+    function loop() {
+      update();
       draw();
     }
+
+    function updateScore() {
+      scoreDisplay.textContent = `Spieler 1: ${score1} | Spieler 2: ${score2}`;
+    }
+
+    function startGame() {
+      clearInterval(gameInterval);
+      score1 = score2 = 0;
+      updateScore();
+      resetPuck();
+      leftPaddle.y = 160;
+      rightPaddle.y = 160;
+      mode = document.getElementById('mode').value;
+      difficulty = document.getElementById('difficulty').value;
+      gameInterval = setInterval(loop, 1000 / 60);
+    }
+
+    // Steuerung
+    document.addEventListener('keydown', e => {
+      if (e.key === 'w') leftPaddle.dy = -5;
+      if (e.key === 's') leftPaddle.dy = 5;
+      if (e.key === 'ArrowUp') rightPaddle.dy = -5;
+      if (e.key === 'ArrowDown') rightPaddle.dy = 5;
+    });
+
+    document.addEventListener('keyup', e => {
+      if (e.key === 'w' || e.key === 's') leftPaddle.dy = 0;
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') rightPaddle.dy = 0;
+    });
   </script>
 </body>
 </html>
