@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MaxLabz Games</title>
   <style>
-    /* Reset & Grunddesign */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: Arial, sans-serif;
@@ -76,27 +75,25 @@
       font-size: 0.9rem;
       color: #777;
     }
-  <style>
-  @keyframes pop {
-    0% { transform: scale(0.8); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
 
-  .logo {
-    animation: pop 0.6s ease-out;
-  }
-</style>
+    @keyframes pop {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
 
-<img src="logo.png" alt="Logo" class="logo" style="width: 200px; height: auto; border-radius: 12px; display: block; margin: 40px auto 20px auto;" />
+    .logo {
+      animation: pop 0.6s ease-out;
+    }
+  </style>
+
+  <img src="logo.png" alt="Logo" class="logo" style="width: 200px; height: auto; border-radius: 12px; display: block; margin: 40px auto 20px auto;" />
 </head>
 <body>
 
   <!-- Firebase Initialisierung -->
   <script type="module" src="firebase-init.js"></script>
 
-  <header>
-
-</header>
+  <header></header>
 
   <nav class="main-nav">
     <a href="index.html">Startseite</a>
@@ -115,6 +112,7 @@
       <a href="Spiele/Tic-tac-Toe/index.html">Tic Tac Toe</a>
       <a href="Spiele/fruit-ninja/index.html">Fruit Ninja</a>
       <a href="Spiele/cookie-clicker/index.html">Cookie Clicker</a>
+      <a href="Spiele/Eishockey/index.html">Eishockey</a> <!-- NEU hinzugefügt -->
     </div>
   </section>
 
