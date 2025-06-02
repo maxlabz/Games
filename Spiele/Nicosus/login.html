@@ -1,1 +1,49 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anmelden – Nicosus</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Anmelden</h1>
+    <nav>
+      <a href="index.html">Startseite</a>
+      <a href="register.html">Registrieren</a>
+    </nav>
+  </header>
 
+  <main>
+    <form id="login-form">
+      <h2>Mit deinem Konto anmelden</h2>
+      <input type="email" id="email" placeholder="E-Mail" required><br>
+      <input type="password" id="password" placeholder="Passwort" required><br>
+      <button type="submit">Anmelden</button>
+    </form>
+  </main>
+
+  <script src="firebase.js"></script>
+  <script type="module">
+    import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    const auth = window.auth;
+
+    const form = document.getElementById("login-form");
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          alert("Anmeldung erfolgreich!");
+          window.location.href = "index.html";
+        })
+        .catch(error => {
+          alert("Fehler bei der Anmeldung:\n" + error.message);
+        });
+    });
+  </script>
+</body>
+</html>
