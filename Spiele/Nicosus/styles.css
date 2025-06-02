@@ -1,12 +1,15 @@
-/* Grundfarben */
 :root {
   --bg-dark: #001f3f;
   --text-light: #ffffff;
-  --accent1: #FF4136; /* rot */
-  --accent2: #2ECC40; /* grün */
-  --accent3: #0074D9; /* blau */
-  --accent4: #FFDC00; /* gelb */
-  --accent5: #B10DC9; /* lila */
+  --accent1: #FF4136;
+  --accent2: #2ECC40;
+  --accent3: #0074D9;
+  --accent4: #FFDC00;
+  --accent5: #B10DC9;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
@@ -15,13 +18,12 @@ body {
   background-color: var(--bg-dark);
   color: var(--text-light);
   animation: backgroundPulse 20s infinite alternate;
+  padding-bottom: 50px;
 }
 
 @keyframes backgroundPulse {
-  0%   { background-color: #001f3f; }
-  25%  { background-color: #002b5c; }
-  50%  { background-color: #001a33; }
-  75%  { background-color: #002244; }
+  0% { background-color: #001f3f; }
+  50% { background-color: #002b5c; }
   100% { background-color: #001f3f; }
 }
 
@@ -29,51 +31,53 @@ header {
   background: linear-gradient(90deg, var(--accent3), var(--accent4));
   padding: 20px;
   text-align: center;
-  color: #000;
 }
 
 h1 {
   margin: 0;
-  font-size: 2.5rem;
+  font-size: 2rem;
 }
 
 nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
   margin-top: 10px;
 }
 
 nav a, nav button {
-  margin: 0 8px;
   text-decoration: none;
   color: #fff;
   font-weight: bold;
   background: linear-gradient(135deg, var(--accent2), var(--accent5));
   padding: 10px 16px;
-  border: none;
   border-radius: 8px;
+  border: none;
   transition: transform 0.3s, background 0.5s;
-  display: inline-block;
+  font-size: 1rem;
 }
 
 nav a:hover, nav button:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
   background: linear-gradient(135deg, var(--accent1), var(--accent4));
   color: #000;
 }
 
 main {
+  padding: 30px 20px;
   text-align: center;
-  padding: 50px 20px;
 }
 
 form {
   background-color: rgba(255, 255, 255, 0.05);
-  padding: 30px;
+  padding: 25px;
   border-radius: 12px;
   display: inline-block;
   text-align: left;
   color: white;
+  width: 100%;
   max-width: 400px;
-  width: 90%;
 }
 
 input {
@@ -101,4 +105,26 @@ button[type="submit"] {
 button[type="submit"]:hover {
   background-color: var(--accent4);
   color: black;
+}
+
+/* RESPONSIVE ANPASSUNG */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  nav a, nav button {
+    padding: 10px;
+    width: 100%;
+    text-align: center;
+  }
+
+  nav {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  main {
+    padding: 20px 10px;
+  }
 }
