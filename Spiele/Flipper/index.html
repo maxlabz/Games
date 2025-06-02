@@ -1,1 +1,158 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flipper – MaxLabz Games</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #121212;
+      color: #f1f1f1;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    header {
+      padding: 20px;
+      background: #1f1f1f;
+      border-bottom: 2px solid #4CAF50;
+    }
+    header h1 {
+      color: #4CAF50;
+      font-size: 2rem;
+    }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      background: #1f1f1f;
+      padding: 10px;
+    }
+    nav a {
+      margin: 5px;
+      padding: 10px 15px;
+      background: #2a2a2a;
+      color: #f1f1f1;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+    nav a:hover {
+      background: #4CAF50;
+      color: #121212;
+    }
+    canvas {
+      background: #000;
+      display: block;
+      margin: 20px auto;
+      border: 4px solid #4CAF50;
+      border-radius: 10px;
+    }
+    .mobile-controls {
+      display: none;
+    }
+    @media (max-width: 768px) {
+      canvas {
+        width: 100%;
+        height: auto;
+      }
+      .mobile-controls {
+        display: flex;
+        justify-content: space-around;
+        margin: 20px;
+      }
+      .mobile-controls button {
+        padding: 15px;
+        font-size: 1.2rem;
+        background: #4CAF50;
+        color: #121212;
+        border: none;
+        border-radius: 10px;
+        width: 40%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Flipper</h1>
+  </header>
+  <nav>
+    <a href="../../index.html">Startseite</a>
+    <a href="../Memory/index.html">Memory</a>
+    <a href="../Quiz/index.html">Quiz</a>
+    <a href="../Snake/index.html">Snake</a>
+    <a href="../Tic-tac-Toe/index.html">Tic Tac Toe</a>
+    <a href="../fruit-ninja/index.html">Fruit Ninja</a>
+    <a href="../cookie-clicker/index.html">Cookie Clicker</a>
+    <a href="../Eishockey/index.html">Eishockey</a>
+  </nav>
 
+  <canvas id="gameCanvas" width="400" height="600"></canvas>
+
+  <div class="mobile-controls">
+    <button onclick="leftFlipper()">Links</button>
+    <button onclick="rightFlipper()">Rechts</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let ball = {
+      x: 200,
+      y: 300,
+      radius: 10,
+      dx: 2,
+      dy: -3
+    };
+
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fillStyle = "#4CAF50";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawBall();
+
+      ball.x += ball.dx;
+      ball.y += ball.dy;
+
+      // Wände
+      if(ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) ball.dx *= -1;
+      if(ball.y - ball.radius < 0) ball.dy *= -1;
+      if(ball.y + ball.radius > canvas.height) {
+        alert("Spiel vorbei!");
+        document.location.reload();
+      }
+
+      requestAnimationFrame(update);
+    }
+
+    function leftFlipper() {
+      ball.dx -= 1;
+      ball.dy -= 1;
+    }
+
+    function rightFlipper() {
+      ball.dx += 1;
+      ball.dy -= 1;
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') leftFlipper();
+      if (e.key === 'ArrowRight') rightFlipper();
+    });
+
+    update();
+  </script>
+</body>
+</html>
