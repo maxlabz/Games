@@ -1,1 +1,167 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Basketball – Nicosus</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #001f3f;
+      color: white;
+      text-align: center;
+      transition: all 0.5s ease;
+    }
 
+    header {
+      background-color: #003366;
+      padding: 1rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    canvas {
+      background-color: #004080;
+      margin-top: 20px;
+      border-radius: 12px;
+    }
+
+    .score {
+      margin-top: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .back-link {
+      margin-top: 1rem;
+      display: inline-block;
+      color: white;
+      text-decoration: underline;
+    }
+
+    .contrast-btn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: #ffffff22;
+      color: white;
+      border: 1px solid white;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+
+    .high-contrast {
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+    .high-contrast header {
+      background-color: #cccccc;
+    }
+
+    .high-contrast canvas {
+      background-color: #dddddd;
+    }
+
+    .high-contrast .back-link {
+      color: #0000cc;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Basketball – Nicosus</h1>
+  </header>
+
+  <button class="contrast-btn" onclick="toggleContrast()">Kontrast ändern</button>
+
+  <canvas id="gameCanvas" width="400" height="600"></canvas>
+  <div class="score">Punkte: <span id="score">0</span></div>
+  <a href="../index.html" class="back-link">← Zurück zur Nicosus-Seite</a>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const scoreDisplay = document.getElementById("score");
+
+    let score = 0;
+    let ball = {
+      x: 200,
+      y: 550,
+      radius: 15,
+      color: "orange",
+      isMoving: false,
+      velocityY: -8
+    };
+
+    let hoop = {
+      x: 150,
+      y: 100,
+      width: 100,
+      height: 10
+    };
+
+    canvas.addEventListener("click", () => {
+      if (!ball.isMoving) {
+        ball.isMoving = true;
+      }
+    });
+
+    function drawHoop() {
+      ctx.fillStyle = "white";
+      ctx.fillRect(hoop.x, hoop.y, hoop.width, hoop.height);
+    }
+
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fillStyle = ball.color;
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function resetBall() {
+      ball.y = 550;
+      ball.isMoving = false;
+    }
+
+    function detectScore() {
+      if (
+        ball.y < hoop.y + hoop.height &&
+        ball.x > hoop.x &&
+        ball.x < hoop.x + hoop.width
+      ) {
+        score++;
+        scoreDisplay.textContent = score;
+      }
+    }
+
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawHoop();
+      drawBall();
+
+      if (ball.isMoving) {
+        ball.y += ball.velocityY;
+        if (ball.y < 80) {
+          detectScore();
+          resetBall();
+        }
+      }
+
+      requestAnimationFrame(update);
+    }
+
+    function toggleContrast() {
+      document.body.classList.toggle("high-contrast");
+    }
+
+    update();
+  </script>
+</body>
+</html>
