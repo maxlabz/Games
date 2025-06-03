@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Basketball – Nicosus</title>
   <style>
     body {
@@ -10,36 +10,34 @@
       font-family: Arial, sans-serif;
       background-color: #001f3f;
       color: white;
-      text-align: center;
-      transition: all 0.5s ease;
+      overflow: hidden;
     }
 
     header {
       background-color: #003366;
       padding: 1rem;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 2rem;
+      text-align: center;
     }
 
     canvas {
       background-color: #004080;
-      margin-top: 20px;
+      display: block;
+      margin: 0 auto;
       border-radius: 12px;
     }
 
     .score {
-      margin-top: 1rem;
+      text-align: center;
       font-size: 1.2rem;
+      margin: 0.5rem;
     }
 
     .back-link {
-      margin-top: 1rem;
-      display: inline-block;
+      display: block;
+      text-align: center;
       color: white;
       text-decoration: underline;
+      margin-bottom: 1rem;
     }
 
     .contrast-btn {
@@ -79,89 +77,119 @@
 
   <button class="contrast-btn" onclick="toggleContrast()">Kontrast ändern</button>
 
-  <canvas id="gameCanvas" width="400" height="600"></canvas>
+  <canvas id="game" width="500" height="600"></canvas>
   <div class="score">Punkte: <span id="score">0</span></div>
   <a href="../index.html" class="back-link">← Zurück zur Nicosus-Seite</a>
 
   <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-    const scoreDisplay = document.getElementById("score");
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('score');
 
     let score = 0;
-    let ball = {
-      x: 200,
+
+    const hoop = { x: 350, y: 200, width: 80, height: 10 };
+
+    const ball = {
+      x: 100,
       y: 550,
-      radius: 15,
-      color: "orange",
-      isMoving: false,
-      velocityY: -8
+      radius: 10,
+      angle: 45,
+      speed: 10,
+      dx: 0,
+      dy: 0,
+      gravity: 0.4,
+      inAir: false
     };
-
-    let hoop = {
-      x: 150,
-      y: 100,
-      width: 100,
-      height: 10
-    };
-
-    canvas.addEventListener("click", () => {
-      if (!ball.isMoving) {
-        ball.isMoving = true;
-      }
-    });
 
     function drawHoop() {
-      ctx.fillStyle = "white";
+      ctx.fillStyle = 'white';
       ctx.fillRect(hoop.x, hoop.y, hoop.width, hoop.height);
     }
 
     function drawBall() {
       ctx.beginPath();
       ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-      ctx.fillStyle = ball.color;
+      ctx.fillStyle = 'orange';
       ctx.fill();
       ctx.closePath();
     }
 
     function resetBall() {
+      ball.x = 100;
       ball.y = 550;
-      ball.isMoving = false;
+      ball.inAir = false;
     }
 
-    function detectScore() {
-      if (
-        ball.y < hoop.y + hoop.height &&
-        ball.x > hoop.x &&
-        ball.x < hoop.x + hoop.width
-      ) {
-        score++;
-        scoreDisplay.textContent = score;
+    function shootBall() {
+      if (!ball.inAir) {
+        const angleRad = ball.angle * Math.PI / 180;
+        ball.dx = ball.speed * Math.cos(angleRad);
+        ball.dy = -ball.speed * Math.sin(angleRad);
+        ball.inAir = true;
       }
     }
 
-    function update() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function drawAngleLine() {
+      const angleRad = ball.angle * Math.PI / 180;
+      ctx.strokeStyle = 'yellow';
+      ctx.beginPath();
+      ctx.moveTo(ball.x, ball.y);
+      ctx.lineTo(
+        ball.x + Math.cos(angleRad) * 40,
+        ball.y - Math.sin(angleRad) * 40
+      );
+      ctx.stroke();
+    }
 
-      drawHoop();
-      drawBall();
+    function updateBall() {
+      if (ball.inAir) {
+        ball.x += ball.dx;
+        ball.y += ball.dy;
+        ball.dy += ball.gravity;
 
-      if (ball.isMoving) {
-        ball.y += ball.velocityY;
-        if (ball.y < 80) {
-          detectScore();
+        // Trefferprüfung
+        if (
+          ball.y > hoop.y &&
+          ball.y < hoop.y + hoop.height &&
+          ball.x > hoop.x &&
+          ball.x < hoop.x + hoop.width
+        ) {
+          score++;
+          scoreDisplay.textContent = score;
+          resetBall();
+        }
+
+        // Außerhalb des Spielfelds
+        if (ball.y > canvas.height || ball.x > canvas.width || ball.x < 0) {
           resetBall();
         }
       }
-
-      requestAnimationFrame(update);
     }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawHoop();
+      drawBall();
+      if (!ball.inAir) drawAngleLine();
+      updateBall();
+      requestAnimationFrame(draw);
+    }
+
+    // Steuerung
+    document.addEventListener('keydown', (e) => {
+      if (!ball.inAir) {
+        if (e.key === 'ArrowUp' && ball.angle < 80) ball.angle += 2;
+        if (e.key === 'ArrowDown' && ball.angle > 10) ball.angle -= 2;
+        if (e.code === 'Space') shootBall();
+      }
+    });
 
     function toggleContrast() {
       document.body.classList.toggle("high-contrast");
     }
 
-    update();
+    draw();
   </script>
 </body>
 </html>
