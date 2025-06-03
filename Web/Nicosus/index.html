@@ -1,1 +1,113 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nicosus</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #001f3f;
+      color: white;
+      transition: all 0.5s ease;
+    }
 
+    header {
+      background-color: #003366;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2.5rem;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      padding: 2rem;
+    }
+
+    .game-card {
+      background-color: #004080;
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s;
+    }
+
+    .game-card:hover {
+      transform: scale(1.05);
+    }
+
+    .contrast-btn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: #ffffff22;
+      color: white;
+      border: 1px solid white;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+
+    .high-contrast {
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+    .high-contrast header {
+      background-color: #cccccc;
+    }
+
+    .high-contrast .game-card {
+      background-color: #dddddd;
+      color: black;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Willkommen bei Nicosus</h1>
+  </header>
+
+  <button class="contrast-btn" onclick="toggleContrast()">Kontrast ändern</button>
+
+  <div class="content">
+    <div class="game-card">
+      <h2>Basketball</h2>
+      <p><a href="#">Spiel starten</a></p>
+    </div>
+    <div class="game-card">
+      <h2>Fußball</h2>
+      <p><a href="#">Spiel starten</a></p>
+    </div>
+    <div class="game-card">
+      <h2>Tennis</h2>
+      <p><a href="#">Spiel starten</a></p>
+    </div>
+    <div class="game-card">
+      <h2>Badminton</h2>
+      <p><a href="#">Spiel starten</a></p>
+    </div>
+  </div>
+
+  <script>
+    function toggleContrast() {
+      document.body.classList.toggle('high-contrast');
+    }
+  </script>
+</body>
+</html>
