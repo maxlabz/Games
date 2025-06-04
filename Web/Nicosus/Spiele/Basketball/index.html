@@ -87,7 +87,11 @@
 
   <div class="controls">
     Winkel: <input type="range" id="angleSlider" min="10" max="80" value="45" oninput="updateAngleLabel()"> 
-    <span id="angleLabel">45°</span>
+    <span id="angleLabel">45°</span><br><br>
+
+    Wucht: <input type="range" id="powerSlider" min="10" max="30" value="22" oninput="updatePowerLabel()">
+    <span id="powerLabel">22</span><br><br>
+
     <button onclick="shootBall()">Werfen</button>
   </div>
 
@@ -101,7 +105,9 @@
     const ctx = canvas.getContext('2d');
     const scoreDisplay = document.getElementById('score');
     const angleSlider = document.getElementById('angleSlider');
+    const powerSlider = document.getElementById('powerSlider');
     const angleLabel = document.getElementById('angleLabel');
+    const powerLabel = document.getElementById('powerLabel');
 
     let score = 0;
 
@@ -111,10 +117,10 @@
       x: 100,
       y: 550,
       radius: 10,
-      speed: 22, // Extra Schwung
+      speed: 22,
       dx: 0,
       dy: 0,
-      gravity: 0.35, // Weniger Gravitation für längeren Flug
+      gravity: 0.35,
       inAir: false
     };
 
@@ -141,7 +147,9 @@
       if (ball.inAir) return;
 
       const angle = parseFloat(angleSlider.value);
+      const power = parseFloat(powerSlider.value);
       const rad = angle * Math.PI / 180;
+      ball.speed = power;
       ball.dx = ball.speed * Math.cos(rad);
       ball.dy = -ball.speed * Math.sin(rad);
       ball.inAir = true;
@@ -198,12 +206,18 @@
       angleLabel.textContent = angleSlider.value + "°";
     }
 
+    function updatePowerLabel() {
+      powerLabel.textContent = powerSlider.value;
+    }
+
     function toggleContrast() {
       document.body.classList.toggle("high-contrast");
     }
 
     updateAngleLabel();
+    updatePowerLabel();
     draw();
   </script>
 </body>
 </html>
+
