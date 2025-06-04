@@ -26,10 +26,33 @@
       border-radius: 12px;
     }
 
+    .controls {
+      text-align: center;
+      margin: 1rem;
+    }
+
+    input[type="number"] {
+      width: 60px;
+      padding: 0.3rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: none;
+      text-align: center;
+    }
+
+    button {
+      margin-left: 1rem;
+      padding: 0.4rem 1rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      background-color: #ffaa00;
+      cursor: pointer;
+    }
+
     .score {
       text-align: center;
       font-size: 1.2rem;
-      margin: 0.5rem;
     }
 
     .back-link {
@@ -77,7 +100,13 @@
 
   <button class="contrast-btn" onclick="toggleContrast()">Kontrast ändern</button>
 
+  <div class="controls">
+    Winkel: <input type="number" id="angleInput" min="10" max="80" value="45">°
+    <button onclick="shootBall()">Werfen</button>
+  </div>
+
   <canvas id="game" width="500" height="600"></canvas>
+
   <div class="score">Punkte: <span id="score">0</span></div>
   <a href="../index.html" class="back-link">← Zurück zur Nicosus-Seite</a>
 
@@ -85,6 +114,7 @@
     const canvas = document.getElementById('game');
     const ctx = canvas.getContext('2d');
     const scoreDisplay = document.getElementById('score');
+    const angleInput = document.getElementById('angleInput');
 
     let score = 0;
 
@@ -94,7 +124,6 @@
       x: 100,
       y: 550,
       radius: 10,
-      angle: 45,
       speed: 10,
       dx: 0,
       dy: 0,
@@ -122,22 +151,28 @@
     }
 
     function shootBall() {
-      if (!ball.inAir) {
-        const angleRad = ball.angle * Math.PI / 180;
-        ball.dx = ball.speed * Math.cos(angleRad);
-        ball.dy = -ball.speed * Math.sin(angleRad);
-        ball.inAir = true;
-      }
+      if (ball.inAir) return;
+
+      let angle = parseFloat(angleInput.value);
+      if (isNaN(angle)) angle = 45;
+      angle = Math.max(10, Math.min(80, angle));
+      angleInput.value = angle;
+
+      const rad = angle * Math.PI / 180;
+      ball.dx = ball.speed * Math.cos(rad);
+      ball.dy = -ball.speed * Math.sin(rad);
+      ball.inAir = true;
     }
 
     function drawAngleLine() {
-      const angleRad = ball.angle * Math.PI / 180;
+      const angle = parseFloat(angleInput.value) || 45;
+      const rad = angle * Math.PI / 180;
       ctx.strokeStyle = 'yellow';
       ctx.beginPath();
       ctx.moveTo(ball.x, ball.y);
       ctx.lineTo(
-        ball.x + Math.cos(angleRad) * 40,
-        ball.y - Math.sin(angleRad) * 40
+        ball.x + Math.cos(rad) * 40,
+        ball.y - Math.sin(rad) * 40
       );
       ctx.stroke();
     }
@@ -160,7 +195,7 @@
           resetBall();
         }
 
-        // Außerhalb des Spielfelds
+        // Verfehlt
         if (ball.y > canvas.height || ball.x > canvas.width || ball.x < 0) {
           resetBall();
         }
@@ -175,15 +210,6 @@
       updateBall();
       requestAnimationFrame(draw);
     }
-
-    // Steuerung
-    document.addEventListener('keydown', (e) => {
-      if (!ball.inAir) {
-        if (e.key === 'ArrowUp' && ball.angle < 80) ball.angle += 2;
-        if (e.key === 'ArrowDown' && ball.angle > 10) ball.angle -= 2;
-        if (e.code === 'Space') shootBall();
-      }
-    });
 
     function toggleContrast() {
       document.body.classList.toggle("high-contrast");
