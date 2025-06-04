@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Wurf-Spiel</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+    }
+    canvas {
+      display: block;
+      background: #333;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let player = { x: canvas.width / 2, y: canvas.height - 50, width: 40, height: 40 };
+    let enemy = { x: 100, y: 100, width: 50, height: 50, dir: 2 };
+    let projectiles = [];
+    let score = 0;
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") player.x -= 20;
+      if (e.key === "ArrowRight") player.x += 20;
+      if (e.key === " ") {
+        projectiles.push({ x: player.x + player.width / 2, y: player.y, radius: 8 });
+      }
+    });
+
+    function drawPlayer() {
+      ctx.fillStyle = "lightblue";
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+    }
+
+    function drawEnemy() {
+      ctx.fillStyle = "red";
+      ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+    }
+
+    function drawProjectiles() {
+      ctx.fillStyle = "yellow";
+      projectiles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Gegner bewegen
+      enemy.x += enemy.dir;
+      if (enemy.x < 0 || enemy.x + enemy.width > canvas.width) {
+        enemy.dir *= -1;
+      }
+
+      // Projektile bewegen
+      projectiles.forEach(p => p.y -= 5);
+      projectiles = projectiles.filter(p => p.y > 0);
+
+      // Kollision
+      projectiles.forEach((p, i) => {
+        if (
+          p.x > enemy.x &&
+          p.x < enemy.x + enemy.width &&
+          p.y > enemy.y &&
+          p.y < enemy.y + enemy.height
+        ) {
+          score++;
+          projectiles.splice(i, 1);
+          enemy.x = Math.random() * (canvas.width - enemy.width); // neuer Ort
+        }
+      });
+
+      drawPlayer();
+      drawEnemy();
+      drawProjectiles();
+
+      // Punktestand anzeigen
+      ctx.fillStyle = "white";
+      ctx.font = "24px sans-serif";
+      ctx.fillText("Treffer: " + score, 20, 30);
+
+      requestAnimationFrame(update);
+    }
+
+    update();
+  </script>
+</body>
+</html>
