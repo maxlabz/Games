@@ -2,44 +2,41 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Basketball – Nicosus</title>
   <style>
-    body {
+    html, body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      padding: 0;
+      height: 100%;
+      overflow-y: auto; /* Scrollen erlauben */
       background-color: #001f3f;
       color: white;
-      overflow: hidden;
+      font-family: Arial, sans-serif;
     }
-
     header {
       background-color: #003366;
       padding: 1rem;
       text-align: center;
     }
-
     canvas {
       background-color: #004080;
       display: block;
-      margin: 0 auto;
+      margin: 0 auto 20px;
       border-radius: 12px;
     }
-
     .controls {
       text-align: center;
       margin: 1rem;
     }
-
     input[type="range"] {
       width: 200px;
     }
-
     .score {
       text-align: center;
       font-size: 1.2rem;
+      margin-bottom: 10px;
     }
-
     .back-link {
       display: block;
       text-align: center;
@@ -47,7 +44,6 @@
       text-decoration: underline;
       margin-bottom: 1rem;
     }
-
     .contrast-btn {
       position: fixed;
       top: 10px;
@@ -58,23 +54,7 @@
       border-radius: 8px;
       padding: 0.5rem 1rem;
       cursor: pointer;
-    }
-
-    .high-contrast {
-      background-color: #ffffff;
-      color: #000000;
-    }
-
-    .high-contrast header {
-      background-color: #cccccc;
-    }
-
-    .high-contrast canvas {
-      background-color: #dddddd;
-    }
-
-    .high-contrast .back-link {
-      color: #0000cc;
+      z-index: 10;
     }
   </style>
 </head>
@@ -86,7 +66,7 @@
   <button class="contrast-btn" onclick="toggleContrast()">Kontrast ändern</button>
 
   <div class="controls">
-    Winkel: <input type="range" id="angleSlider" min="10" max="80" value="45" oninput="updateAngleLabel()"> 
+    Winkel: <input type="range" id="angleSlider" min="10" max="80" value="45" oninput="updateAngleLabel()">
     <span id="angleLabel">45°</span><br><br>
 
     Wucht: <input type="range" id="powerSlider" min="10" max="30" value="22" oninput="updatePowerLabel()">
@@ -95,7 +75,7 @@
     <button onclick="shootBall()">Werfen</button>
   </div>
 
-  <canvas id="game" width="500" height="600"></canvas>
+  <canvas id="game" width="500" height="720"></canvas>
 
   <div class="score">Punkte: <span id="score">0</span></div>
   <a href="../index.html" class="back-link">← Zurück zur Nicosus-Seite</a>
@@ -111,21 +91,21 @@
 
     let score = 0;
 
-    // Korb-Position rechts an der Wand
+    // Korb-Position rechts an der Wand, tiefer positioniert
     const hoop = {
-      backboardX: 460,    // Backboard links oben
-      backboardY: 150,
+      backboardX: 460,
+      backboardY: 250,
       backboardWidth: 20,
       backboardHeight: 120,
 
-      ringX: 440,         // Ring-Mittelpunkt
-      ringY: 280,
+      ringX: 440,
+      ringY: 380,
       ringRadius: 18
     };
 
     const ball = {
       x: 100,
-      y: 550,
+      y: 680,
       radius: 10,
       speed: 22,
       dx: 0,
@@ -135,9 +115,8 @@
     };
 
     function drawBackboard() {
-      ctx.fillStyle = '#eee'; // helles Glas
+      ctx.fillStyle = '#eee';
       ctx.fillRect(hoop.backboardX, hoop.backboardY, hoop.backboardWidth, hoop.backboardHeight);
-      // leichter Glanzeffekt
       ctx.strokeStyle = '#bbb';
       ctx.lineWidth = 2;
       ctx.strokeRect(hoop.backboardX, hoop.backboardY, hoop.backboardWidth, hoop.backboardHeight);
@@ -154,8 +133,6 @@
     function drawNet() {
       ctx.strokeStyle = 'white';
       ctx.lineWidth = 2;
-
-      // 6 Linien, leicht gebogen unter dem Ring
       const netTopY = hoop.ringY + hoop.ringRadius;
       for(let i = -2; i <= 2; i++) {
         ctx.beginPath();
@@ -167,8 +144,6 @@
         );
         ctx.stroke();
       }
-
-      // horizontale Linien
       for(let j = 0; j < 3; j++) {
         ctx.beginPath();
         ctx.moveTo(hoop.ringX - 18, netTopY + j * 13);
@@ -190,26 +165,23 @@
       ctx.fill();
       ctx.closePath();
 
-      // Linien für Basketball-Optik
       ctx.lineWidth = 2;
       ctx.strokeStyle = 'black';
       ctx.beginPath();
       ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
       ctx.stroke();
 
-      // vertikale Linie
+      // Linien auf dem Ball für Realismus
       ctx.beginPath();
       ctx.moveTo(ball.x, ball.y - ball.radius);
       ctx.lineTo(ball.x, ball.y + ball.radius);
       ctx.stroke();
 
-      // horizontale Linie
       ctx.beginPath();
       ctx.moveTo(ball.x - ball.radius, ball.y);
       ctx.lineTo(ball.x + ball.radius, ball.y);
       ctx.stroke();
 
-      // diagonale Linien
       ctx.beginPath();
       ctx.moveTo(ball.x - ball.radius * 0.7, ball.y - ball.radius * 0.7);
       ctx.lineTo(ball.x + ball.radius * 0.7, ball.y + ball.radius * 0.7);
@@ -223,8 +195,10 @@
 
     function resetBall() {
       ball.x = 100;
-      ball.y = 550;
+      ball.y = 680;
       ball.inAir = false;
+      ball.dx = 0;
+      ball.dy = 0;
     }
 
     function shootBall() {
@@ -252,16 +226,15 @@
       ctx.stroke();
     }
 
-    // Prüft, ob Ball den Korb trifft (durch Ring fällt)
     function checkScore() {
       const dx = ball.x - hoop.ringX;
       const dy = ball.y - hoop.ringY;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
       if (
-        dist > hoop.ringRadius - 6 && // etwas Toleranz zu Ringdicke (6)
+        dist > hoop.ringRadius - 6 &&
         dist < hoop.ringRadius + ball.radius &&
-        ball.dy > 0 && // fällt nach unten
+        ball.dy > 0 &&
         ball.y > hoop.ringY
       ) {
         return true;
@@ -269,7 +242,13 @@
       return false;
     }
 
-    function updateBall() {
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawHoop();
+      drawBall();
+      drawAngleLine();
+
       if (ball.inAir) {
         ball.x += ball.dx;
         ball.y += ball.dy;
@@ -281,4 +260,37 @@
           resetBall();
         }
 
-        if (ball.y > canvas.height || ball.x > canvas.width || ball.x
+        // Ball außerhalb sichtbarer Fläche? Dann zurücksetzen
+        if (ball.y > canvas.height || ball.x > canvas.width || ball.x < 0) {
+          resetBall();
+        }
+      }
+
+      requestAnimationFrame(update);
+    }
+
+    function updateAngleLabel() {
+      angleLabel.textContent = angleSlider.value + '°';
+    }
+    function updatePowerLabel() {
+      powerLabel.textContent = powerSlider.value;
+    }
+
+    function toggleContrast() {
+      if(document.body.style.backgroundColor === 'black'){
+        document.body.style.backgroundColor = '#001f3f';
+        document.body.style.color = 'white';
+      } else {
+        document.body.style.backgroundColor = 'black';
+        document.body.style.color = 'yellow';
+      }
+    }
+
+    updateAngleLabel();
+    updatePowerLabel();
+    resetBall();
+    update();
+
+  </script>
+</body>
+</html>
