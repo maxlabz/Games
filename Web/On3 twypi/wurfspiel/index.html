@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Wurf-Spiel</title>
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: #111;
-      color: white;
-      font-family: sans-serif;
+      margin: 0; padding: 0; overflow: hidden;
+      background: linear-gradient(to bottom, #1e3c72, #2a5298);
+      color: white; font-family: sans-serif;
     }
     canvas {
       display: block;
-      background: #333;
+      background: transparent;
     }
   </style>
 </head>
@@ -29,61 +26,76 @@
     canvas.height = window.innerHeight;
 
     let player = { x: canvas.width / 2, y: canvas.height - 50, width: 40, height: 40 };
-    let enemy = { x: 100, y: 100, width: 50, height: 50, dir: 2 };
+    let enemy = { x: 100, y: 100, width: 60, height: 60, dir: 2 };
     let projectiles = [];
     let score = 0;
+
+    const monkeyImg = new Image();
+    monkeyImg.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Gorilla_face.svg/1200px-Gorilla_face.svg.png";
+
+    const bananaImg = new Image();
+    bananaImg.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/64px-Banana-Single.jpg";
+
+    // Timer-Variablen für Schüsse
+    let shots = 0;
+    const maxShots = 10;
+    const interval = 10000; // 10 Sekunden
+
+    setInterval(() => {
+      shots = 0; // Schusszähler alle 10 Sekunden zurücksetzen
+    }, interval);
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "ArrowLeft") player.x -= 20;
       if (e.key === "ArrowRight") player.x += 20;
-      if (e.key === " ") {
-        projectiles.push({ x: player.x + player.width / 2, y: player.y, radius: 8 });
+      if (e.key === " " && shots < maxShots) {
+        projectiles.push({ x: player.x + player.width / 2 - 16, y: player.y, width: 32, height: 32 });
+        shots++;
       }
     });
 
     function drawPlayer() {
-      ctx.fillStyle = "lightblue";
-      ctx.fillRect(player.x, player.y, player.width, player.height);
+      ctx.fillStyle = "#00ffcc";
+      ctx.beginPath();
+      ctx.arc(player.x + player.width / 2, player.y + player.height / 2, 20, 0, Math.PI * 2);
+      ctx.fill();
     }
 
     function drawEnemy() {
-      ctx.fillStyle = "red";
-      ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+      if (monkeyImg.complete) {
+        ctx.drawImage(monkeyImg, enemy.x, enemy.y, enemy.width, enemy.height);
+      }
     }
 
     function drawProjectiles() {
-      ctx.fillStyle = "yellow";
       projectiles.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fill();
+        if (bananaImg.complete) {
+          ctx.drawImage(bananaImg, p.x, p.y, p.width, p.height);
+        }
       });
     }
 
     function update() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Gegner bewegen
       enemy.x += enemy.dir;
       if (enemy.x < 0 || enemy.x + enemy.width > canvas.width) {
         enemy.dir *= -1;
       }
 
-      // Projektile bewegen
       projectiles.forEach(p => p.y -= 5);
-      projectiles = projectiles.filter(p => p.y > 0);
+      projectiles = projectiles.filter(p => p.y + p.height > 0);
 
-      // Kollision
       projectiles.forEach((p, i) => {
         if (
-          p.x > enemy.x &&
+          p.x + p.width > enemy.x &&
           p.x < enemy.x + enemy.width &&
-          p.y > enemy.y &&
-          p.y < enemy.y + enemy.height
+          p.y < enemy.y + enemy.height &&
+          p.y + p.height > enemy.y
         ) {
           score++;
           projectiles.splice(i, 1);
-          enemy.x = Math.random() * (canvas.width - enemy.width); // neuer Ort
+          enemy.x = Math.random() * (canvas.width - enemy.width);
         }
       });
 
@@ -91,15 +103,18 @@
       drawEnemy();
       drawProjectiles();
 
-      // Punktestand anzeigen
       ctx.fillStyle = "white";
       ctx.font = "24px sans-serif";
       ctx.fillText("Treffer: " + score, 20, 30);
 
+      ctx.fillText(`Schüsse: ${shots}/${maxShots}`, 20, 60);
+
       requestAnimationFrame(update);
     }
 
-    update();
+    bananaImg.onload = () => {
+      monkeyImg.onload = update;
+    };
   </script>
 </body>
 </html>
