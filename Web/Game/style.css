@@ -1,0 +1,29 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: linear-gradient(145deg, #0a0a0a, #1e1e1e);
+  color: #fff;
+  text-align: center;
+}
+
+header {
+  padding: 20px;
+  background: linear-gradient(to right, #ff0055, #5500ff);
+  color: white;
+}
+
+nav {
+  margin-top: 10px;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  margin: 0 15px;
+  font-size: 1.2em;
+  transition: color 0.3s;
+}
+
+nav a:hover {
+  color: #ffff00;
+}
