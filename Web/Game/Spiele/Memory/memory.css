@@ -1,71 +1,76 @@
-body {
-  margin: 0;
-  background: #000;
-  color: white;
-  font-family: sans-serif;
-  text-align: center;
+const emojis = ["🍎", "🍌", "🍇", "🍓", "🍍", "🍒", "🥝", "🍉"];
+let cards = [...emojis, ...emojis];
+cards = cards.sort(() => 0.5 - Math.random());
+
+const board = document.getElementById("memory-game");
+const message = document.getElementById("message");
+
+let firstCard = null;
+let secondCard = null;
+let lockBoard = false;
+let matchedPairs = 0;
+
+function createBoard() {
+  cards.forEach((symbol) => {
+    const card = document.createElement("div");
+    card.classList.add("card");
+
+    const inner = document.createElement("div");
+    inner.classList.add("inner");
+
+    const front = document.createElement("div");
+    front.classList.add("front");
+    front.textContent = symbol;
+
+    const back = document.createElement("div");
+    back.classList.add("back");
+
+    inner.appendChild(front);
+    inner.appendChild(back);
+    card.appendChild(inner);
+
+    card.dataset.symbol = symbol;
+
+    card.addEventListener("click", () => {
+      if (lockBoard || card.classList.contains("revealed") || card === firstCard) return;
+
+      card.classList.add("revealed");
+
+      if (!firstCard) {
+        firstCard = card;
+      } else {
+        secondCard = card;
+        checkMatch();
+      }
+    });
+
+    board.appendChild(card);
+  });
 }
 
-header {
-  padding: 20px;
+function checkMatch() {
+  lockBoard = true;
+
+  const match = firstCard.dataset.symbol === secondCard.dataset.symbol;
+
+  if (match) {
+    matchedPairs++;
+    resetCards();
+    if (matchedPairs === emojis.length) {
+      message.textContent = "🎉 Du hast alle Paare gefunden!";
+    }
+  } else {
+    setTimeout(() => {
+      firstCard.classList.remove("revealed");
+      secondCard.classList.remove("revealed");
+      resetCards();
+    }, 1000);
+  }
 }
 
-nav a {
-  color: #0ff;
-  margin: 0 10px;
-  text-decoration: none;
+function resetCards() {
+  [firstCard, secondCard] = [null, null];
+  lockBoard = false;
 }
 
-.game-container {
-  display: grid;
-  grid-template-columns: repeat(4, 80px);
-  grid-gap: 15px;
-  justify-content: center;
-  margin: 40px auto;
-}
-
-.card {
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(45deg, #ff0066, #00ccff);
-  border-radius: 10px;
-  cursor: pointer;
-  position: relative;
-  perspective: 1000px;
-  transform-style: preserve-3d;
-  transition: transform 0.3s ease;
-}
-
-.card .inner {
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-  transition: transform 0.5s;
-  position: relative;
-}
-
-.card.revealed .inner {
-  transform: rotateY(180deg);
-}
-
-.card .front, .card .back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  font-size: 2em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-}
-
-.card .front {
-  background: #fff;
-  color: #000;
-  transform: rotateY(180deg);
-}
-
-.card .back {
-  background: linear-gradient(45deg, #ff0066, #00ccff);
-}
+createBoard();
