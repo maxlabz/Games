@@ -18,12 +18,18 @@
   color: transparent;
   cursor: pointer;
   transition: 0.3s ease-in-out;
+  position: relative;
   user-select: none;
 }
 
-.card.revealed {
-  color: #000;
-  background: #fff;
+.card::after {
+  content: attr(data-symbol);
+  color: transparent;
+  transition: color 0.3s ease;
+}
+
+.card.revealed::after {
+  color: black;
 }
 
 #message {
