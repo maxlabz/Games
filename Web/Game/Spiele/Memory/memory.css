@@ -15,19 +15,21 @@
   align-items: center;
   justify-content: center;
   font-size: 2em;
-  color: transparent;
   cursor: pointer;
   transition: 0.3s ease-in-out;
   position: relative;
   user-select: none;
 }
 
+/* Das Symbol anzeigen, aber standardmäßig verstecken */
 .card::after {
   content: attr(data-symbol);
+  font-size: 2em;
   color: transparent;
   transition: color 0.3s ease;
 }
 
+/* Nur wenn aufgedeckt */
 .card.revealed::after {
   color: black;
 }
