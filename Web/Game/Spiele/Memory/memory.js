@@ -17,7 +17,7 @@ function createBoard() {
     card.dataset.symbol = symbol;
 
     card.addEventListener("click", () => {
-      if (lockBoard || card.classList.contains("revealed")) return;
+      if (lockBoard || card.classList.contains("revealed") || card === firstCard) return;
 
       card.classList.add("revealed");
 
@@ -36,11 +36,12 @@ function createBoard() {
 function checkMatch() {
   lockBoard = true;
 
-  const isMatch = firstCard.dataset.symbol === secondCard.dataset.symbol;
+  const match = firstCard.dataset.symbol === secondCard.dataset.symbol;
 
-  if (isMatch) {
+  if (match) {
     matchedPairs++;
-    resetSelection();
+    resetCards();
+
     if (matchedPairs === emojis.length) {
       message.innerText = "🎉 Du hast alle Paare gefunden!";
     }
@@ -48,12 +49,12 @@ function checkMatch() {
     setTimeout(() => {
       firstCard.classList.remove("revealed");
       secondCard.classList.remove("revealed");
-      resetSelection();
+      resetCards();
     }, 1000);
   }
 }
 
-function resetSelection() {
+function resetCards() {
   [firstCard, secondCard] = [null, null];
   lockBoard = false;
 }
