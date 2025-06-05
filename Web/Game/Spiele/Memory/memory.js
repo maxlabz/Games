@@ -15,7 +15,6 @@ function createBoard() {
     const card = document.createElement("div");
     card.classList.add("card");
     card.dataset.symbol = symbol;
-    card.innerText = symbol;
 
     card.addEventListener("click", () => {
       if (lockBoard || card.classList.contains("revealed")) return;
