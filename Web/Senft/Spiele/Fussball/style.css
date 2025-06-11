@@ -1,1 +1,52 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom right, #0f0f2f, #1a1a1a);
+  color: white;
+  text-align: center;
+}
 
+header {
+  padding: 1em;
+  background-color: #121212;
+  border-bottom: 2px solid #444;
+}
+
+nav a {
+  color: #00ffff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+#scoreboard {
+  display: flex;
+  justify-content: space-around;
+  font-size: 1.5em;
+  margin: 10px 0;
+}
+
+canvas {
+  background-color: green;
+  border: 4px solid white;
+  display: block;
+  margin: 0 auto;
+}
+
+.buttons {
+  margin-top: 15px;
+}
+
+button {
+  padding: 10px 20px;
+  margin: 5px;
+  background-color: #0077ff;
+  color: white;
+  border: none;
+  font-size: 1em;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0055cc;
+}
