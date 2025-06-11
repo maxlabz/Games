@@ -1,1 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Auto Drift Game</title>
+  <style>
+    canvas {
+      background: #111;
+      display: block;
+      margin: auto;
+      border: 2px solid white;
+    }
+  </style>
+</head>
+<body>
+<canvas id="gameCanvas" width="400" height="600"></canvas>
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+const car = {
+  x: canvas.width / 2,
+  y: canvas.height - 100,
+  width: 40,
+  height: 80,
+  speed: 0,
+  accel: 0.05,
+  velY: 0,
+  maxVelY: 4
+};
+
+let keys = {};
+
+document.addEventListener("keydown", e => keys[e.key] = true);
+document.addEventListener("keyup", e => keys[e.key] = false);
+
+function update() {
+  car.speed += car.accel;
+
+  if (keys["ArrowUp"]) car.velY = -car.maxVelY;
 
