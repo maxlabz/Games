@@ -6,26 +6,26 @@
     canvas {
       background: #111;
       display: block;
-      margin: auto;
-      border: 2px solid white;
+      margin: 40px auto;
+      border: 3px solid #fff;
     }
   </style>
 </head>
 <body>
-<canvas id="gameCanvas" width="400" height="600"></canvas>
+<canvas id="gameCanvas" width="600" height="400"></canvas>
 <script>
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
 const car = {
-  x: canvas.width / 2,
-  y: canvas.height - 100,
+  x: 100,
+  y: canvas.height / 2 - 20,
   width: 40,
-  height: 80,
-  speed: 0,
-  accel: 0.05,
-  velY: 0,
-  maxVelY: 4
+  height: 40,
+  speedX: 2,        // Startgeschwindigkeit nach rechts
+  accel: 0.01,
+  speedY: 0,
+  maxSpeedY: 3
 };
 
 let keys = {};
@@ -34,7 +34,46 @@ document.addEventListener("keydown", e => keys[e.key] = true);
 document.addEventListener("keyup", e => keys[e.key] = false);
 
 function update() {
-  car.speed += car.accel;
+  car.speedX += car.accel;
 
-  if (keys["ArrowUp"]) car.velY = -car.maxVelY;
+  // Hoch / Runter steuern
+  if (keys["ArrowUp"]) {
+    car.speedY = -car.maxSpeedY;
+  } else if (keys["ArrowDown"]) {
+    car.speedY = car.maxSpeedY;
+  } else {
+    car.speedY = 0;
+  }
+
+  car.x += car.speedX;
+  car.y += car.speedY;
+
+  // Game Over Bedingung (Auto berührt linken oder rechten Rand)
+  if (car.x < 0 || car.x + car.width > canvas.width) {
+    alert("Game Over! Du bist aus der Spur geraten.");
+    document.location.reload();
+  }
+
+  // Begrenzung oben/unten
+  if (car.y < 0) car.y = 0;
+  if (car.y + car.height > canvas.height) car.y = canvas.height - car.height;
+}
+
+function drawCar() {
+  ctx.fillStyle = "red";
+  ctx.fillRect(car.x, car.y, car.width, car.height);
+}
+
+function gameLoop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  update();
+  drawCar();
+  requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+</script>
+</body>
+</html>
+
 
