@@ -1,79 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Auto Drift Game</title>
+  <title>Auto-Testspiel</title>
   <style>
     canvas {
-      background: #111;
       display: block;
-      margin: 40px auto;
-      border: 3px solid #fff;
+      margin: 30px auto;
+      background-color: black;
+      border: 2px solid white;
     }
   </style>
 </head>
 <body>
-<canvas id="gameCanvas" width="600" height="400"></canvas>
+<canvas id="gameCanvas" width="500" height="300"></canvas>
 <script>
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-const car = {
-  x: 100,
-  y: canvas.height / 2 - 20,
-  width: 40,
-  height: 40,
-  speedX: 2,        // Startgeschwindigkeit nach rechts
-  accel: 0.01,
-  speedY: 0,
-  maxSpeedY: 3
-};
+let carX = 50;
+let carY = 100;
+let carSpeedX = 2;
 
-let keys = {};
-
-document.addEventListener("keydown", e => keys[e.key] = true);
-document.addEventListener("keyup", e => keys[e.key] = false);
-
-function update() {
-  car.speedX += car.accel;
-
-  // Hoch / Runter steuern
-  if (keys["ArrowUp"]) {
-    car.speedY = -car.maxSpeedY;
-  } else if (keys["ArrowDown"]) {
-    car.speedY = car.maxSpeedY;
-  } else {
-    car.speedY = 0;
-  }
-
-  car.x += car.speedX;
-  car.y += car.speedY;
-
-  // Game Over Bedingung (Auto berührt linken oder rechten Rand)
-  if (car.x < 0 || car.x + car.width > canvas.width) {
-    alert("Game Over! Du bist aus der Spur geraten.");
-    document.location.reload();
-  }
-
-  // Begrenzung oben/unten
-  if (car.y < 0) car.y = 0;
-  if (car.y + car.height > canvas.height) car.y = canvas.height - car.height;
-}
-
-function drawCar() {
-  ctx.fillStyle = "red";
-  ctx.fillRect(car.x, car.y, car.width, car.height);
-}
-
-function gameLoop() {
+function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  update();
-  drawCar();
-  requestAnimationFrame(gameLoop);
+
+  // Auto zeichnen (rotes Rechteck)
+  ctx.fillStyle = "red";
+  ctx.fillRect(carX, carY, 40, 30);
+
+  // Bewegung
+  carX += carSpeedX;
+
+  // Game Over Bedingung
+  if (carX > canvas.width || carX < 0) {
+    alert("Game Over – Auto ist vom Bildschirm!");
+    carX = 50;
+  }
+
+  requestAnimationFrame(draw);
 }
 
-gameLoop();
+draw();
 </script>
 </body>
 </html>
-
 
