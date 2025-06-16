@@ -69,6 +69,8 @@
 
   <button class="contrast-btn" onclick="toggleContrast()">Kontrast ändern</button>
 
+  <canvas id="game"></canvas>
+
   <div class="controls">
     Winkel: <input type="range" id="angleSlider" min="10" max="80" value="45" oninput="updateAngleLabel()">
     <span id="angleLabel">45°</span><br><br>
@@ -79,8 +81,6 @@
     <button onclick="shootBall()">Werfen</button>
   </div>
 
-  <canvas id="game"></canvas>
-
   <div class="score">Punkte: <span id="score">0</span></div>
   <a href="../index.html" class="back-link">← Zurück zur Nicosus-Seite</a>
 
@@ -88,11 +88,9 @@
     const canvas = document.getElementById('game');
     const ctx = canvas.getContext('2d');
 
-    // Basisgröße für Skalierung
     let baseWidth = 500;
     let baseHeight = 720;
 
-    // Responsive Größe setzen
     function resizeCanvas() {
       const scale = Math.min(window.innerWidth / baseWidth, 1);
       canvas.width = baseWidth * scale;
@@ -104,7 +102,6 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Korb-Position relativ zur Basisgröße
     const hoop = {
       get backboardX() { return 460 * scaleRatio; },
       get backboardY() { return 250 * scaleRatio; },
