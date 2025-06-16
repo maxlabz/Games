@@ -92,6 +92,7 @@
     let baseWidth = 500;
     let baseHeight = 720;
 
+    // Responsive Größe setzen
     function resizeCanvas() {
       const scale = Math.min(window.innerWidth / baseWidth, 1);
       canvas.width = baseWidth * scale;
@@ -103,6 +104,7 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
+    // Korb-Position relativ zur Basisgröße
     const hoop = {
       get backboardX() { return 460 * scaleRatio; },
       get backboardY() { return 250 * scaleRatio; },
