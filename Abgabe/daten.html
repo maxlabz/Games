@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Dateien für Lehrer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Abgegebene Dateien</h2>
+  <div id="fileList">
+    <p>🔽 <a href="Dateien/Deutsch_Hausaufgabe.pdf" download>Deutsch_Hausaufgabe.pdf</a></p>
+    <p>🔽 <a href="Dateien/Mathe_Arbeitsblatt.pdf" download>Mathe_Arbeitsblatt.pdf</a></p>
+    <!-- Weitere Dateien hier -->
+  </div>
+
+  <script>
+    if (localStorage.getItem("eingeloggt") !== "true") {
+      alert("Bitte zuerst einloggen!");
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
