@@ -1,6 +1,6 @@
 // Liste erlaubter Nutzer
 const users = {
-  "lehrer1": "passwort123",
+  "Stemmer-Goretzki": "deutschtagebuch",
   "lehrerin": "geheim",
   // weitere Lehrer hier einfügen
 };
