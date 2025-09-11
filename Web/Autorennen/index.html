@@ -1,27 +1,29 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>3D Autorennen</title>
-  <link rel="stylesheet" href="style.css">
-  <!-- Three.js & OrbitControls -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
+  <meta charset="UTF-8">
+  <title>3D Rennspiel Test</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #87ceeb; }
+    canvas { display: block; }
+    #hud {
+      position: absolute;
+      top: 10px; left: 10px;
+      color: white;
+      font-family: sans-serif;
+      font-size: 20px;
+      background: rgba(0,0,0,0.4);
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
-  <div id="hud">
-    <div id="speed">Geschw.: 0 km/h</div>
-    <div id="distance">Rest: 5000 m</div>
-    <div id="powerups">
-      <button id="useBoost">Boost</button>
-      <button id="useShield">Shield</button>
-      <button id="useSlow">Slow</button>
-    </div>
-    <div id="message"></div>
-  </div>
+  <div id="hud">Speed: 0 km/h</div>
   <canvas id="c"></canvas>
 
+  <script src="https://cdn.jsdelivr.net/npm/three@0.164.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.164.0/examples/js/controls/OrbitControls.min.js"></script>
   <script src="main.js"></script>
 </body>
 </html>
