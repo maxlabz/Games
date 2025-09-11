@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>3D Autorennen (Starter)</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Three.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+  <div id="hud">
+    <div id="speed">Geschw.: 0 km/h</div>
+    <div id="distance">Rest: 5000 m</div>
+    <div id="powerups">
+      <button id="useBoost">Boost</button>
+      <button id="useShield">Shield</button>
+      <button id="useSlow">Slow</button>
+    </div>
+    <div id="message"></div>
+  </div>
+  <canvas id="c"></canvas>
+
+  <script src="main.js"></script>
+</body>
+</html>
