@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Klassen-Chooser</title>
+  <script type="module" src="script.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; text-align: center; }
+    #admin { display: none; margin-top: 20px; }
+    #current { margin-top: 30px; font-size: 1.5em; font-weight: bold; }
+    input { margin: 5px; padding: 6px; }
+    button { margin: 5px; padding: 8px 12px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Klassen-Chooser</h1>
+
+  <!-- Login Formular -->
+  <div id="login">
+    <input type="email" id="email" placeholder="Lehrer E-Mail"><br>
+    <input type="password" id="password" placeholder="Passwort"><br>
+    <button id="loginBtn">Login</button>
+    <button id="logoutBtn" style="display:none;">Logout</button>
+  </div>
+
+  <!-- Admin-Bereich (nur Lehrer sieht das) -->
+  <div id="admin">
+    <h2>Lehrer-Bereich</h2>
+    <button id="chooseBtn">Zufällig Schüler auswählen</button>
+  </div>
+
+  <!-- Öffentlicher Bereich -->
+  <div id="current">
+    <h2>Gerade ausgewählt:</h2>
+    <p id="currentStudent">Noch niemand ausgewählt</p>
+  </div>
+</body>
+</html>
