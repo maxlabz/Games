@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Klassen-Chooser</title>
-  <script type="module" src="script.js"></script>
   <style>
     body { font-family: Arial, sans-serif; background: #f4f4f4; text-align: center; }
     #admin { display: none; margin-top: 20px; }
@@ -34,5 +33,118 @@
     <h2>Gerade ausgewählt:</h2>
     <p id="currentStudent">Noch niemand ausgewählt</p>
   </div>
+
+  <!-- Firebase + Logik -->
+  <script type="module">
+    // Firebase SDKs von CDN laden
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { 
+      getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { 
+      getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs 
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    // Firebase Konfiguration
+    const firebaseConfig = {
+      apiKey: "AIzaSyC11STApxGXQoCFQsOZEfpItgWYUChXKYQ",
+      authDomain: "klassen-chooser.firebaseapp.com",
+      projectId: "klassen-chooser",
+      storageBucket: "klassen-chooser.appspot.com",
+      messagingSenderId: "196733798812",
+      appId: "1:196733798812:web:94db849e5b2dc2012ba059",
+      measurementId: "G-GHH42LMHHJ"
+    };
+
+    // Firebase starten
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // UI Elemente
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const emailInput = document.getElementById("email");
+    const passInput = document.getElementById("password");
+    const adminDiv = document.getElementById("admin");
+    const currentStudentEl = document.getElementById("currentStudent");
+    const chooseBtn = document.getElementById("chooseBtn");
+
+    // Schülerliste
+    const students = ["Max", "Lisa", "Paul", "Sophie", "Jonas"];
+
+    // === LOGIN ===
+    loginBtn.onclick = () => {
+      signInWithEmailAndPassword(auth, emailInput.value, passInput.value)
+        .catch(err => alert("Fehler: " + err.message));
+    };
+
+    logoutBtn.onclick = () => {
+      signOut(auth);
+    };
+
+    // Auth-Status überwachen
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        adminDiv.style.display = "block";
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline";
+        emailInput.style.display = "none";
+        passInput.style.display = "none";
+      } else {
+        adminDiv.style.display = "none";
+        loginBtn.style.display = "inline";
+        logoutBtn.style.display = "none";
+        emailInput.style.display = "inline";
+        passInput.style.display = "inline";
+      }
+    });
+
+    // === Schüler vorbereiten ===
+    async function initStudents() {
+      for (let name of students) {
+        const ref = doc(db, "students", name);
+        const snapshot = await getDoc(ref);
+        if (!snapshot.exists()) {
+          await setDoc(ref, { count: 0 });
+        }
+      }
+    }
+
+    // === Fair auswählen ===
+    chooseBtn.onclick = async () => {
+      await initStudents();
+      const snapshot = await getDocs(collection(db, "students"));
+
+      let minCount = Infinity;
+      let candidates = [];
+
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        if (data.count < minCount) {
+          minCount = data.count;
+          candidates = [docSnap.id];
+        } else if (data.count === minCount) {
+          candidates.push(docSnap.id);
+        }
+      });
+
+      const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+      await updateDoc(doc(db, "students", chosen), { count: minCount + 1 });
+      await setDoc(doc(db, "status", "current"), { name: chosen });
+
+      currentStudentEl.textContent = chosen;
+    };
+
+    // === Aktuellen Schüler laden ===
+    async function loadCurrentStudent() {
+      const docRef = doc(db, "status", "current");
+      const snapshot = await getDoc(docRef);
+      if (snapshot.exists()) {
+        currentStudentEl.textContent = snapshot.data().name;
+      }
+    }
+    loadCurrentStudent();
+  </script>
 </body>
 </html>
